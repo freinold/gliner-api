@@ -1,7 +1,7 @@
 [project]
 name = "gliner-api"
 version = "0.1.0"
-description = "Add your description here"
+description = "A minimal FastAPI app serving GLiNER models"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = ["fastapi[standard]>=0.115.12", "uvicorn[standard]>=0.34.2"]
