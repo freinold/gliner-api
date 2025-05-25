@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  gliner-api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - "~/.cache/huggingface:/app/huggingface"
+    stdin_open: true
+    tty: true
