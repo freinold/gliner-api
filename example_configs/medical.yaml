@@ -1,0 +1,22 @@
+name: medical
+model: Ihor/gliner-biomed-large-v1.0
+defaults:
+  threshold: 0.3
+  entities:
+  - anatomy
+  - bacteria
+  - demographic information
+  - disease
+  - doctor
+  - drug dosage
+  - drug frequency
+  - drug
+  - illness
+  - lab test value
+  - lab test
+  - medical worker
+  - procedure
+  - symptom
+  - test
+  - treatment
+  - virus

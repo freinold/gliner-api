@@ -1,0 +1,8 @@
+name: general
+model: knowledgator/gliner-x-base-v0.5
+defaults:
+  threshold: 0.5
+  entities:
+  - person
+  - organization
+  - location

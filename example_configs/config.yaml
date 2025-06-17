@@ -1,0 +1,5 @@
+name: { name } # Expressive name of your model configuration
+model: { model } # Huggingface model identifier
+defaults:
+  threshold: { threshold } # default confidence threshold for entity recognition
+  entities: [ { entities } ] # default list of entities to recognize
