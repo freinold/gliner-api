@@ -1,75 +1,112 @@
 from pydantic import BaseModel, Field
 
+from gliner_api.config import GlinerModelConfig
+
 
 class Entity(BaseModel):
-    start: int
-    end: int
-    text: str
-    label: str
-    score: float = Field(ge=0.0, le=1.0)
-    detector: str = Field(description="Name of the detector that found this entity")
+    start: int = Field(
+        ge=0,
+        description="Start index of the entity in the input text",
+    )
+    end: int = Field(
+        ge=0,
+        description="End index of the entity in the input text",
+    )
+    text: str = Field(
+        description="Text of the entity, extracted from the input text",
+    )
+    type: str = Field(
+        validation_alias="label",
+        description="Entity type or label",
+    )
+    score: float = Field(
+        ge=0.0,
+        le=1.0,
+        description="Confidence score of the entity detection, between 0 and 1",
+    )
 
 
 class DetectionRequest(BaseModel):
-    text: str
-    detectors: list[str] = Field(default=["pii", "medical"], description="List of detectors to use")
-    threshold: float | None = Field(default=None, description="Override threshold for all detectors")
+    text: str = Field(
+        description="Input text to analyze for entities",
+        examples=["Sam Altman works at OpenAI in San Francisco."],
+    )
+    threshold: float | None = Field(
+        default=None,
+        description="Threshold for entity detection; if not set, uses default threshold (see gliner config from /api/info endpoint)",
+        examples=[0.5],
+    )
+    entity_types: list[str] | None = Field(
+        default=None,
+        description="List of entity types to detect; if not set, uses default entities (see gliner config from /api/info endpoint)",
+        examples=[["person", "organization", "location"]],
+    )
 
 
 class DetectionResponse(BaseModel):
-    entities: list[Entity]
+    entities: list[Entity] = Field(
+        description="List of detected entities in the input text",
+        examples=[
+            [
+                Entity(start=0, end=11, text="Sam Altman", type="person", score=0.95),
+                Entity(start=22, end=27, text="OpenAI", type="organization", score=0.98),
+                Entity(start=31, end=44, text="San Francisco", type="location", score=0.92),
+            ]
+        ],
+    )
 
 
 class BatchDetectionRequest(BaseModel):
-    texts: list[str]
-    detectors: list[str] = Field(
-        default=[
-            "pii",
-            "medical",
+    texts: list[str] = Field(
+        description="List of input texts to analyze for entities",
+        examples=[
+            [
+                "Sam Altman works at OpenAI in San Francisco.",
+                "Queen Elizabeth was the head of the Windsor family and resided in London.",
+            ],
         ],
-        description="List of detectors to use",
     )
-    threshold: float | None = Field(default=None, description="Override threshold for all detectors")
+    threshold: float | None = Field(
+        default=None,
+        description="Threshold for entity detection; if not set, uses default threshold (see gliner config from /api/info endpoint)",
+    )
+    entity_types: list[str] | None = Field(
+        default=None,
+        description="List of entity types to detect; if not set, uses default entities (see gliner config from /api/info endpoint)",
+        examples=[["person", "organization", "location"]],
+    )
 
 
 class BatchDetectionResponse(BaseModel):
-    results: list[list[Entity]]
-
-
-class ModelConfig(BaseModel):
-    model: str = Field(
-        default="knowledgator/gliner-x-base-v0.5",
-        description="Model identifier",
-    )
-    use_case: str = Field(
-        default="general",
-        description="Use case for the model",
-    )
-    default_entities: list[str] = Field(
-        default=[
-            "Person",
-            "Organization",
-            "Location",
+    results: list[list[Entity]] = Field(
+        description="List of lists of detected entities for each input text",
+        examples=[
+            [
+                [
+                    Entity(start=0, end=11, text="Sam Altman", type="person", score=0.95),
+                    Entity(start=22, end=27, text="OpenAI", type="organization", score=0.98),
+                    Entity(start=31, end=44, text="San Francisco", type="location", score=0.92),
+                ],
+                [
+                    Entity(start=0, end=13, text="Queen Elizabeth", type="person", score=0.97),
+                    Entity(start=30, end=47, text="Windsor family", type="organization", score=0.62),
+                    Entity(start=41, end=47, text="London", type="location", score=0.93),
+                ],
+            ]
         ],
-        description="Default entities to detect",
-    )
-    default_threshold: float = Field(
-        default=0.5,
-        ge=0.0,
-        le=1.0,
-        description="Default threshold for entity detection",
     )
 
 
-class ModelListResponse(BaseModel):
-    models: list[ModelConfig] = Field(
-        default=[
-            ModelConfig(
-                model="knowledgator/gliner-x-base-v0.5",
-                use_case="general",
-                default_entities=["Person", "Organization", "Location"],
-                default_threshold=0.5,
-            )
-        ],
-        description="List of available models with their configurations",
+class InfoResponse(BaseModel):
+    gliner_config: GlinerModelConfig = Field(
+        default_factory=GlinerModelConfig,
+        description="Configuration for the GLiNER model",
+    )
+    api_key_required: bool = Field(
+        default=False,
+        description="Whether an API key is required for requests",
+    )
+    configured_use_case: str = Field(
+        default="default",
+        description="The configured use case for this deployment",
     )
