@@ -14,10 +14,9 @@
   ],
   packageRules: [
     {
-      "matchDatasources": ["python-version"],
-      "matchPackageNames": ["python"],
-      "versioning": "python",
-      "allowedVersions": "3.12.x"
+      matchPackageNames: ["python"],
+      versioning: "python",
+      allowedVersions: "3.12.x"
     }
   ],
   lockFileMaintenance: {
