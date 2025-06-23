@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --no-dev --extra gpu --compile-bytecode
 
 # Use slim image as runner
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm@sha256:47e795319f66a715a096fdf1928e23a4d565d29c0104c7add29b2d111a8c7de7 AS runner
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS runner
 
 # Metadata for the image
 LABEL org.opencontainers.image.authors='Fabian Reinold <contact@freinold.eu>' \
