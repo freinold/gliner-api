@@ -1,10 +1,14 @@
 from functools import lru_cache
 
-from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict, YamlConfigSettingsSource
+from pydantic import Field
+from pydantic_settings import BaseSettings, CliSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict, YamlConfigSettingsSource
 
 
-class GlinerModelConfig(BaseModel):
+class Config(BaseSettings):
+    use_case: str = Field(
+        default="general",
+        description="The use case for the GLiNER model, used to load specific configurations.",
+    )
     model_id: str = Field(
         default="knowledgator/gliner-x-base-v0.5",
         description="The Huggingface model ID for a GLiNER model.",
@@ -19,20 +23,19 @@ class GlinerModelConfig(BaseModel):
         le=1.0,
         description="The default threshold for entity detection, used if request includes no specific threshold.",
     )
-
-
-class Config(BaseSettings):
-    use_case: str = Field(
-        default="default",
-        description="The use case for the GLiNER model, used to load specific configurations.",
-    )
-    gliner_config: GlinerModelConfig = Field(
-        default_factory=GlinerModelConfig,
-        description="Configuration for the GLiNER model, including model ID, default entities and default threshold.",
-    )
     api_key: str | None = Field(
         default=None,
         description="API key for authentication; if provided, each request needs to include it.",
+    )
+    host: str = Field(
+        default="0.0.0.0",
+        description="The host address for serving the API.",
+    )
+    port: int = Field(
+        default=8080,
+        ge=1,
+        le=65535,
+        description="The port number for serving the API.",
     )
 
     # pydantic_settings configuration starts here
@@ -45,6 +48,7 @@ class Config(BaseSettings):
         nested_model_default_partial_update=True,
         yaml_file="config.yaml",
         yaml_file_encoding="utf-8",
+        cli_parse_args=True,
     )
 
     # Reorder settings sources to prioritize YAML config
@@ -59,6 +63,7 @@ class Config(BaseSettings):
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         return (
             init_settings,
+            CliSettingsSource(settings_cls),
             env_settings,
             YamlConfigSettingsSource(settings_cls),
             dotenv_settings,
