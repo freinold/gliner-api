@@ -14,7 +14,7 @@
   ],
   packageRules: [
     {
-      matchPackageNames: ["python"],
+      matchPackageNames: ["python", "python-version"],
       versioning: "python",
       allowedVersions: "3.12.x"
     }
