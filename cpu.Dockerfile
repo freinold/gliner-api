@@ -2,7 +2,9 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:7fc7d030e69807610096804ffe498dff01419f5e6718cbc9ed2e2f7ea59729f2 AS builder
 
 # Install build tools needed for some packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     libboost-all-dev \
