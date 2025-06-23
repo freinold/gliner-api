@@ -1,5 +1,6 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  description: "Renovate config for freinold/gliner-api",
   extends: [
     "config:recommended", // recommended configuration
     "config:best-practices", // best practices
@@ -10,6 +11,14 @@
     ":separateMultipleMajorReleases", // separate major updates of dependencies into separate PRs
     ":timezone(Europe/Berlin)", // sets correct timezone for schedule based operations
     "security:openssf-scorecard", // show OpenSSF badge on pull requests to evaluate security health metrics for dependencies
+  ],
+  packageRules: [
+    {
+      "matchDatasources": ["python-version"],
+      "matchPackageNames": ["python"],
+      "versioning": "python",
+      "allowedVersions": "3.12.x"
+    }
   ],
   lockFileMaintenance: {
     enabled: true
