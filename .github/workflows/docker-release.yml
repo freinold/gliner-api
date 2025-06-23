@@ -1,7 +1,6 @@
 name: Release and Build Docker Image
 permissions:
   contents: read
-  actions: write        # required by actions/cache to save new entries
   packages: write
 
 on:
@@ -20,6 +19,9 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
+    permissions:
+      actions: write # required by actions/cache to save new entries
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
