@@ -1,4 +1,7 @@
 name: Release and Build Docker Image
+permissions:
+  contents: read
+  packages: write
 
 on:
   push:
