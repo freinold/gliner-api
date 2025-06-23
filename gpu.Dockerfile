@@ -28,6 +28,19 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Use slim image as runner
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm AS runner
 
+# Metadata for the image
+LABEL org.opencontainers.image.authors='Fabian Reinold <contact@freinold.eu>' \
+    org.opencontainers.image.vendor='Fabian Reinold' \
+    org.opencontainers.image.created='$(date -u +%Y-%m-%dT%H:%M:%SZ)' \
+    org.opencontainers.image.revision='$(git rev-parse HEAD)' \
+    org.opencontainers.image.version='$(git describe --tags --always)' \
+    org.opencontainers.image.url='https://github.com/freinold/gliner-api/pkgs/container/gliner-api-gpu' \
+    org.opencontainers.image.documentation='https://github.com/freinold/gliner-api/README.md' \
+    org.opencontainers.image.source='https://github.com/freinold/gliner-api' \
+    org.opencontainers.image.licenses='MIT' \
+    org.opencontainers.image.title='gliner-api' \
+    org.opencontainers.image.description='A minimal FastAPI app serving GLiNER models; this image is built for GPU only.'
+
 # Install the project into `/app`
 WORKDIR /app
 

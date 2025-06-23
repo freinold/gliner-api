@@ -3,7 +3,13 @@ name: Release and Build Docker Image
 on:
   push:
     tags:
-      - "v*" # Triggers on version tags like v1.2.3
+      - "*" # Triggers on tags
+  workflow_dispatch: # Allows manual triggering of the workflow
+    inputs:
+      tag:
+        description: "Tag to release"
+        required: true
+        default: "latest"
   release:
     types: [published]
 
