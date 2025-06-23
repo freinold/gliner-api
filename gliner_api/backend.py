@@ -50,7 +50,7 @@ async def lifespan(_: FastAPI):
 app: FastAPI = FastAPI(
     title="GLiNER Detection API",
     description="API for GLiNER entity detection",
-    version="1.0.0",
+    version="0.1.0",
     lifespan=lifespan,
 )
 
