@@ -1,7 +1,6 @@
 name: Release and Build Docker Image
 permissions:
   contents: read
-  packages: write
 
 on:
   push:
@@ -22,6 +21,7 @@ jobs:
 
     permissions:
       actions: write # required by actions/cache to save new entries
+      packages: write # required by docker/build-push-action to push images to GitHub Container Registry
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
