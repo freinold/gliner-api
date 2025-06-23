@@ -1,8 +1,10 @@
 name: general
 model: knowledgator/gliner-x-base-v0.5
-defaults:
-  threshold: 0.5
-  entities:
-  - person
-  - organization
-  - location
+default_threshold: 0.5
+default_entities:
+- person
+- organization
+- location
+api_key: null
+host: "0.0.0.0"
+port: 8080

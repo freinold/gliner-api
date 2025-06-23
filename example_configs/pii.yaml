@@ -1,28 +1,30 @@
 name: pii
 model: E3-JSI/gliner-multi-pii-domains-v1
-defaults:
-  threshold: 0.5
-  entities:
-  - address
-  - age
-  - bank account number
-  - city
-  - country
-  - credit card number
-  - date
-  - date of birth
-  - drivers license number
-  - email
-  - health insurance number
-  - iban
-  - ip address
-  - license plate
-  - location
-  - passport number
-  - person
-  - phone number
-  - social security number
-  - state
-  - tax identification number
-  - vehicle identification number
-  - zip code
+default_threshold: 0.5
+default_entities:
+- address
+- age
+- bank account number
+- city
+- country
+- credit card number
+- date
+- date of birth
+- drivers license number
+- email
+- health insurance number
+- iban
+- ip address
+- license plate
+- location
+- passport number
+- person
+- phone number
+- social security number
+- state
+- tax identification number
+- vehicle identification number
+- zip code
+api_key: null
+host: "0.0.0.0"
+port: 8080
