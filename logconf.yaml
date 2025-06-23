@@ -1,0 +1,31 @@
+version: 1
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  http:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+  json:
+    class: gliner_api.logging.JsonFormatter
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: json
+    stream: ext://sys.stdout
+loggers:
+  uvicorn:
+    level: INFO
+    handlers: [ console ]
+    propagate: no
+  uvicorn.error:
+    level: INFO
+    handlers: [ console ]
+    propagate: no
+  gliner-api:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+root:
+  level: INFO
+  handlers: [ console ]

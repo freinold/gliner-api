@@ -6,7 +6,7 @@ from datetime import datetime
 from yaml import safe_load
 
 
-def getLogger(name: str = "riski-extractor") -> logging.Logger:
+def getLogger(name: str = "gliner-api") -> logging.Logger:
     """Configures logging and returns a logger with the specified name.
 
     Parameters:
@@ -69,7 +69,8 @@ class JsonFormatter(logging.Formatter):
             "processName",
             "process",
         }
-        extra = {k: v for k, v in record.__dict__.items() if k not in standard_attrs}
+        # Exclude 'color_message' from extra fields
+        extra = {k: v for k, v in record.__dict__.items() if k not in standard_attrs and k != "color_message"}
         if extra:
             log_data.update(extra)
 
