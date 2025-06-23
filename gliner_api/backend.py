@@ -1,134 +1,196 @@
 from contextlib import asynccontextmanager
+from logging import Logger
+from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from gliner import GLiNER
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
 
-from gliner_api.datamodel import BatchDetectionRequest, BatchDetectionResponse, DetectionRequest, DetectionResponse, Entity
-from gliner_api.helpers import merge_overlapping_entities
+from gliner_api.config import Config, get_config
+from gliner_api.datamodel import (
+    BatchDetectionRequest,
+    BatchDetectionResponse,
+    DetectionRequest,
+    DetectionResponse,
+    Entity,
+    ErrorMessage,
+    HealthCheckResponse,
+    InfoResponse,
+    deep_entity_list_adapter,
+    entity_list_adapter,
+)
+from gliner_api.logging import getLogger
 
-models: dict[str, str | GLiNER] = {}
+gliner: GLiNER | None = None
+config: Config | None = None
+
+logger: Logger = getLogger("gliner-api.backend")
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    # Load models on startup
-    print("Loading GLiNER models...")
-    for name, model_path in models.items():
-        print(f"Loading {name} model: {model_path}")
-        models[name] = GLiNER.from_pretrained(model_path)
-        print(f"✓ {name} model loaded successfully")
+    """Lifespan event handler to initialize GLiNER model and configuration."""
+    global config
+    logger.info("Initializing GLiNER API...")
+    config = get_config()
+    logger.info(f"Loaded configuration for use case {config.use_case}.")
+    logger.debug(f"Configuration: {config}")
 
-    print("All models loaded successfully!")
+    global gliner
+    logger.info(f"Loading GLiNER model {config.model_id}...")
+    gliner = GLiNER.from_pretrained(config.model_id)
+    logger.info("GLiNER model loaded.")
     yield
 
-    # Cleanup on shutdown
-    models.clear()
+    gliner = None
 
 
-app = FastAPI(
-    title="GLiNER Detection Service",
-    description="Remote service for GLiNER entity detection",
+app: FastAPI = FastAPI(
+    title="GLiNER Detection API",
+    description="API for GLiNER entity detection",
     version="1.0.0",
     lifespan=lifespan,
 )
 
+bearer: HTTPBearer = HTTPBearer(
+    auto_error=False,
+    description="API Key for authentication",
+    bearerFormat="API Key",
+)
 
-@app.post("/detect", response_model=DetectionResponse)
-async def detect_entities(request: DetectionRequest):
+
+def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(dependency=bearer)) -> None:
+    if config is None:
+        raise HTTPException(status_code=500, detail="Server Error: No config present")
+    if config.api_key is None:
+        return
+    if credentials.scheme.lower() != "bearer":
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail={"error": "InvalidAuthenticationScheme", "message": "Authentication scheme must be Bearer"},
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if credentials.credentials != config.api_key:
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN,
+            detail={"error": "InvalidAPIKey", "message": "Provided API key is invalid"},
+        )
+    return
+
+
+@app.get(path="/", include_in_schema=False)
+async def docs_forward() -> RedirectResponse:
+    return RedirectResponse(url="/docs")
+
+
+@app.post(
+    path="/api/invoke",
+    responses={
+        200: {"model": DetectionResponse},
+        401: {"model": ErrorMessage},
+        403: {"model": ErrorMessage},
+        500: {"model": ErrorMessage},
+    },
+    dependencies=[Depends(dependency=verify_api_key)],
+)
+async def detect_entities(
+    request: DetectionRequest,
+) -> DetectionResponse:
     """Detect entities in text using specified detectors."""
+    if config is None:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "ServerConfigError",
+                "message": "No config present",
+            },
+        )
+
+    if gliner is None:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "ModelLoadError",
+                "message": "No GLiNER model loaded",
+            },
+        )
+
     try:
-        all_entities = []
+        threshold: float = request.threshold if request.threshold is not None else config.default_threshold
+        entities: list[str] = request.entity_types if request.entity_types else config.default_entities
 
-        for detector_name in request.detectors:
-            if detector_name not in models:
-                raise HTTPException(status_code=400, detail=f"Unknown detector: {detector_name}")
+        raw_entities: list[dict[str, Any]] = gliner.predict_entities(
+            text=request.text,
+            labels=entities,
+            flat_ner=True,
+            threshold=threshold,
+            multi_label=False,
+        )
 
-            model = models[detector_name]
-            config = {}
-            threshold = request.threshold if request.threshold is not None else config["default_threshold"]
-
-            # Predict entities
-            raw_entities = model.predict_entities(text=request.text, labels=config["entities"], threshold=threshold)
-
-            # Convert to our Entity model with detector info
-            for entity_dict in raw_entities:
-                entity = Entity(
-                    start=entity_dict["start"],
-                    end=entity_dict["end"],
-                    text=entity_dict["text"],
-                    label=entity_dict["label"],
-                    score=entity_dict["score"],
-                    detector=detector_name,
-                )
-                all_entities.append(entity)
-
-        # Merge overlapping entities
-        merged_entities = merge_overlapping_entities(all_entities)
-
-        return DetectionResponse(entities=merged_entities)
+        parsed_entities: list[Entity] = entity_list_adapter.validate_python(raw_entities)
+        return DetectionResponse(entities=parsed_entities)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(object=e))
 
 
-@app.post("/detect/batch", response_model=BatchDetectionResponse)
-async def detect_entities_batch(request: BatchDetectionRequest):
+@app.post(
+    path="/api/batch",
+    responses={
+        200: {"model": DetectionResponse},
+        401: {"model": ErrorMessage},
+        403: {"model": ErrorMessage},
+        500: {"model": ErrorMessage},
+    },
+    dependencies=[Depends(dependency=verify_api_key)],
+)
+async def detect_entities_batch(
+    request: BatchDetectionRequest,
+) -> BatchDetectionResponse:
     """Detect entities in a batch of texts using specified detectors."""
+    if config is None:
+        raise HTTPException(status_code=500, detail="Server Error: No config present")
+
+    if gliner is None:
+        raise HTTPException(status_code=500, detail="Server Error: No GLiNER model loaded")
+
     try:
-        batch_results = []
+        threshold: float = request.threshold if request.threshold is not None else config.default_threshold
+        entities: list[str] = request.entity_types if request.entity_types else config.default_entities
 
-        for text in request.texts:
-            text_entities = []
+        raw_entities_list: list[list[dict[str, Any]]] = gliner.batch_predict_entities(
+            texts=request.texts,
+            labels=entities,
+            flat_ner=True,
+            threshold=threshold,
+            multi_label=False,
+        )
 
-            for detector_name in request.detectors:
-                if detector_name not in models:
-                    raise HTTPException(status_code=400, detail=f"Unknown detector: {detector_name}")
-
-                model = models[detector_name]
-                config = {}
-                threshold = request.threshold if request.threshold is not None else config["default_threshold"]
-
-                # Predict entities
-                raw_entities = model.predict_entities(text=text, labels=config["entities"], threshold=threshold)
-
-                # Convert to our Entity model with detector info
-                for entity_dict in raw_entities:
-                    entity = Entity(
-                        start=entity_dict["start"],
-                        end=entity_dict["end"],
-                        text=entity_dict["text"],
-                        label=entity_dict["label"],
-                        score=entity_dict["score"],
-                        detector=detector_name,
-                    )
-                    text_entities.append(entity)
-
-            # Merge overlapping entities for this text
-            merged_entities = merge_overlapping_entities(text_entities)
-            batch_results.append(merged_entities)
-
-        return BatchDetectionResponse(results=batch_results)
+        parsed_entities_list: list[list[Entity]] = deep_entity_list_adapter.validate_python(raw_entities_list)
+        return BatchDetectionResponse(entities=parsed_entities_list)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/health")
-async def health_check():
+@app.get("/api/health")
+async def health_check() -> HealthCheckResponse:
     """Health check endpoint."""
-    return {"status": "healthy", "models_loaded": list(models.keys())}
+    return HealthCheckResponse(status="healthy")
 
 
-@app.get("/models")
-async def list_models():
-    """List available models and their configurations."""
-    return {
-        "models": {
-            name: {
-                "model_path": models[name],
-                "entities": {},
-                "default_threshold": 0,
-            }
-            for name in models.keys()
-        }
-    }
+@app.get("/api/info")
+async def info() -> InfoResponse:
+    """Information on configured model and default settings."""
+    if config is None:
+        raise HTTPException(status_code=500, detail="Server Error: No config present")
+
+    return InfoResponse(
+        api_key_required=config.api_key is not None,
+        model_id=config.model_id,
+        default_entities=config.default_entities,
+        default_threshold=config.default_threshold,
+        configured_use_case=config.use_case,
+    )
