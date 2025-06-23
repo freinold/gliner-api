@@ -1,6 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field, TypeAdapter
 
-from gliner_api.config import GlinerModelConfig
+
+class ErrorMessage(BaseModel):
+    error: str = Field(description="Short error code")
+    detail: str = Field(description="Detailed error explanaiton")
 
 
 class Entity(BaseModel):
@@ -16,7 +19,7 @@ class Entity(BaseModel):
         description="Text of the entity, extracted from the input text",
     )
     type: str = Field(
-        validation_alias="label",
+        validation_alias=AliasChoices("type", "label"),
         description="Entity type or label",
     )
     score: float = Field(
@@ -48,9 +51,9 @@ class DetectionResponse(BaseModel):
         description="List of detected entities in the input text",
         examples=[
             [
-                Entity(start=0, end=11, text="Sam Altman", type="person", score=0.95),
-                Entity(start=22, end=27, text="OpenAI", type="organization", score=0.98),
-                Entity(start=31, end=44, text="San Francisco", type="location", score=0.92),
+                Entity(start=0, end=10, text="Sam Altman", type="person", score=0.95),
+                Entity(start=20, end=26, text="OpenAI", type="organization", score=0.98),
+                Entity(start=30, end=43, text="San Francisco", type="location", score=0.92),
             ]
         ],
     )
@@ -78,14 +81,14 @@ class BatchDetectionRequest(BaseModel):
 
 
 class BatchDetectionResponse(BaseModel):
-    results: list[list[Entity]] = Field(
+    entities: list[list[Entity]] = Field(
         description="List of lists of detected entities for each input text",
         examples=[
             [
                 [
-                    Entity(start=0, end=11, text="Sam Altman", type="person", score=0.95),
-                    Entity(start=22, end=27, text="OpenAI", type="organization", score=0.98),
-                    Entity(start=31, end=44, text="San Francisco", type="location", score=0.92),
+                    Entity(start=0, end=10, text="Sam Altman", type="person", score=0.95),
+                    Entity(start=20, end=26, text="OpenAI", type="organization", score=0.98),
+                    Entity(start=30, end=43, text="San Francisco", type="location", score=0.92),
                 ],
                 [
                     Entity(start=0, end=13, text="Queen Elizabeth", type="person", score=0.97),
@@ -97,16 +100,38 @@ class BatchDetectionResponse(BaseModel):
     )
 
 
+class HealthCheckResponse(BaseModel):
+    status: str = Field(
+        description="Health status of the GLiNER API",
+        examples=["healthy"],
+    )
+
+
 class InfoResponse(BaseModel):
-    gliner_config: GlinerModelConfig = Field(
-        default_factory=GlinerModelConfig,
-        description="Configuration for the GLiNER model",
+    model_id: str = Field(
+        description="The Huggingface model ID for a GLiNER model.",
+        examples=["knowledgator/gliner-x-base-v0.5"],
+    )
+    default_entities: list[str] = Field(
+        description="The default entities to be detected, used if request includes no specific entities.",
+        examples=[["person", "organization", "location"]],
+    )
+    default_threshold: float = Field(
+        description="The default threshold for entity detection, used if request includes no specific threshold.",
+        examples=[0.5],
+        ge=0.0,
+        le=1.0,
     )
     api_key_required: bool = Field(
-        default=False,
         description="Whether an API key is required for requests",
+        examples=[False],
     )
     configured_use_case: str = Field(
-        default="default",
         description="The configured use case for this deployment",
+        examples=["general"],
     )
+
+
+# Define TypeAdapter for Entity list once and reuse it
+entity_list_adapter: TypeAdapter[list[Entity]] = TypeAdapter(list[Entity])
+deep_entity_list_adapter: TypeAdapter[list[list[Entity]]] = TypeAdapter(list[list[Entity]])
