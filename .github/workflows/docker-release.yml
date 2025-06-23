@@ -40,6 +40,14 @@ jobs:
           TAG=${GITHUB_REF#refs/tags/}
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
+      - name: Cache uv cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
       - name: Build and push Docker image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
@@ -47,6 +55,8 @@ jobs:
           file: ./cpu.Dockerfile
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Image digest
         run: |
@@ -78,6 +88,14 @@ jobs:
           TAG=${GITHUB_REF#refs/tags/}
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
+      - name: Cache uv cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: ${{ runner.os }}-uv-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
       - name: Build and push GPU Docker image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
@@ -85,6 +103,8 @@ jobs:
           file: ./gpu.Dockerfile
           push: true
           tags: ghcr.io/${{ github.repository }}-gpu:${{ steps.vars.outputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Image digest
         run: |
