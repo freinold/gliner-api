@@ -1,5 +1,10 @@
 # gliner-api
 
+[![License](https://img.shields.io/github/license/freinold/gliner-api)](https://github.com/freinold/gliner-api/blob/main/LICENSE)
+[![CodeQL](https://github.com/freinold/gliner-api/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/freinold/gliner-api/actions/workflows/github-code-scanning/codeql)
+[![Build Container Image](https://github.com/freinold/gliner-api/actions/workflows/docker-release.yml/badge.svg)](https://github.com/freinold/gliner-api/actions/workflows/docker-release.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/freinold/gliner-api/badge)](https://scorecard.dev/viewer/?uri=github.com/freinold/gliner-api)
+
 A minimal FastAPI app serving GLiNER models
 
 ## Installation
