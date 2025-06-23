@@ -1,5 +1,5 @@
 # Use a full image with uv pre-installed as builder
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm@sha256:47e795319f66a715a096fdf1928e23a4d565d29c0104c7add29b2d111a8c7de7 AS builder
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:7fc7d030e69807610096804ffe498dff01419f5e6718cbc9ed2e2f7ea59729f2 AS builder
 
 # Install build tools needed for some packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
