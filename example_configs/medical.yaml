@@ -1,22 +1,24 @@
 name: medical
 model: Ihor/gliner-biomed-large-v1.0
-defaults:
-  threshold: 0.3
-  entities:
-  - anatomy
-  - bacteria
-  - demographic information
-  - disease
-  - doctor
-  - drug dosage
-  - drug frequency
-  - drug
-  - illness
-  - lab test value
-  - lab test
-  - medical worker
-  - procedure
-  - symptom
-  - test
-  - treatment
-  - virus
+default_threshold: 0.5
+default_entities:
+- anatomy
+- bacteria
+- demographic information
+- disease
+- doctor
+- drug dosage
+- drug frequency
+- drug
+- illness
+- lab test value
+- lab test
+- medical worker
+- procedure
+- symptom
+- test
+- treatment
+- virus
+api_key: null
+host: "0.0.0.0"
+port: 8080

@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, CliSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict, YamlConfigSettingsSource
 
 
@@ -8,6 +8,7 @@ class Config(BaseSettings):
     use_case: str = Field(
         default="general",
         description="The use case for the GLiNER model, used to load specific configurations.",
+        validation_alias=AliasChoices("use_case", "name"),
     )
     model_id: str = Field(
         default="knowledgator/gliner-x-base-v0.5",
