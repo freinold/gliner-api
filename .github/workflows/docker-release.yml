@@ -3,7 +3,7 @@ name: Release and Build Docker Image
 on:
   push:
     tags:
-      - 'v*'  # Triggers on version tags like v1.2.3
+      - "v*" # Triggers on version tags like v1.2.3
   release:
     types: [published]
 
@@ -38,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./cpu.Dockerfile
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.tag }}
 
@@ -76,7 +76,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile.gpu
+          file: ./gpu.Dockerfile
           push: true
           tags: ghcr.io/${{ github.repository }}-gpu:${{ steps.vars.outputs.tag }}
 

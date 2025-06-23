@@ -1,0 +1,53 @@
+# Use a full image with uv pre-installed as builder
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm AS builder
+
+# Install build tools needed for some packages
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     build-essential \
+#     cmake \
+#     libboost-all-dev \
+#     libeigen3-dev \
+#     && rm -rf /var/lib/apt/lists/*
+
+# Install the project into `/app`
+WORKDIR /app
+
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy from the cache instead of linking since it's a mounted volume
+ENV UV_LINK_MODE=copy
+
+# Copy the application files into the container
+COPY . /app
+
+# Install the dependencies
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --no-dev --extra cpu --compile-bytecode 
+
+# Use slim image as runner
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm AS runner
+
+# Install the project into `/app`
+WORKDIR /app
+
+# Nur das, was du wirklich brauchst, übernehmen:
+COPY --from=builder /app /app
+COPY --from=builder /app/.venv /app/.venv
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Set cache directory for Huggingface Models
+ENV HF_HOME=/app/huggingface
+
+# Disable tqdm for cleaner logs
+ENV TQDM_DISABLE=1
+
+# Disable python warnings
+ENV PYTHONWARNINGS="ignore"
+
+# Reset the entrypoint, don't invoke `uv`
+ENTRYPOINT ["uv", "run", "main.py"]
+
+CMD ["--host", "0.0.0.0", "--port", "8080"]

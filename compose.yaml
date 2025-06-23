@@ -1,10 +1,10 @@
-version: "3.8"
-
 services:
   gliner-api:
-    build: .
+    build:
+      context: .
+      dockerfile: cpu.Dockerfile
     ports:
-      - "8000:8000"
+      - "8080:8080"
     volumes:
       - "~/.cache/huggingface:/app/huggingface"
     stdin_open: true
