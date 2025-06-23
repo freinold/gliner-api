@@ -2,12 +2,12 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm@sha256:47e795319f66a715a096fdf1928e23a4d565d29c0104c7add29b2d111a8c7de7 AS builder
 
 # Install build tools needed for some packages
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-#     build-essential \
-#     cmake \
-#     libboost-all-dev \
-#     libeigen3-dev \
-#     && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    libboost-all-dev \
+    libeigen3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install the project into `/app`
 WORKDIR /app
