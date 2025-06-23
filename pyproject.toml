@@ -3,7 +3,7 @@ name = "gliner-api"
 version = "0.1.0"
 description = "A minimal FastAPI app serving GLiNER models"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = "==3.12.11"
 dependencies = [
     "fastapi[standard]>=0.115.12",
     "gitpython>=3.1.44",

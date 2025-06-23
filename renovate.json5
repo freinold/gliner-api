@@ -14,8 +14,11 @@
   ],
   packageRules: [
     {
-      matchPackageNames: ["python", "python-version"],
-      versioning: "python",
+      matchPackageNames: ["python"],
+      allowedVersions: "3.12.x"
+    },
+    { 
+      matchDepTpes: ["requires-python"],
       allowedVersions: "3.12.x"
     }
   ],
