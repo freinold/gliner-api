@@ -7,7 +7,7 @@ requires-python = "==3.12.11"
 dependencies = [
     "fastapi[standard]==0.115.13",
     "gitpython==3.1.44",
-    "pydantic-settings==2.10.0",
+    "pydantic-settings==2.10.1",
     "uvicorn[standard]==0.34.3",
 ]
 
