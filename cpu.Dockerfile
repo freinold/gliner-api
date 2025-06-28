@@ -63,6 +63,6 @@ ENV TQDM_DISABLE=1
 ENV PYTHONWARNINGS="ignore"
 
 # Reset the entrypoint, don't invoke `uv`
-ENTRYPOINT ["uv", "run", "main.py"]
+ENTRYPOINT ["python", "main.py"]
 
 CMD ["--host", "0.0.0.0", "--port", "8080"]
