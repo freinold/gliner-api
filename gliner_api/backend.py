@@ -107,9 +107,9 @@ async def detect_entities(
         raw_entities: list[dict[str, Any]] = gliner.predict_entities(
             text=request.text,
             labels=request.entity_types,
-            flat_ner=True,
+            flat_ner=request.flat_ner,
             threshold=request.threshold,
-            multi_label=False,
+            multi_label=request.multi_label,
         )
 
         parsed_entities: list[Entity] = entity_list_adapter.validate_python(raw_entities)
@@ -140,9 +140,9 @@ async def detect_entities_batch(
         raw_entities_list: list[list[dict[str, Any]]] = gliner.batch_predict_entities(
             texts=request.texts,
             labels=request.entity_types,
-            flat_ner=True,
+            flat_ner=request.flat_ner,
             threshold=request.threshold,
-            multi_label=False,
+            multi_label=request.multi_label,
         )
 
         parsed_entities_list: list[list[Entity]] = deep_entity_list_adapter.validate_python(raw_entities_list)
