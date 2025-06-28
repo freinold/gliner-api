@@ -59,8 +59,6 @@ bearer: HTTPBearer = HTTPBearer(
 
 
 def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(dependency=bearer)) -> None:
-    if config is None:
-        raise HTTPException(status_code=500, detail="Server Error: No config present")
     if config.api_key is None:
         return
     if credentials.scheme.lower() != "bearer":
@@ -96,15 +94,6 @@ async def detect_entities(
     request: DetectionRequest,
 ) -> DetectionResponse:
     """Detect entities in text using specified detectors."""
-    if config is None:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "error": "ServerConfigError",
-                "message": "No config present",
-            },
-        )
-
     if gliner is None:
         raise HTTPException(
             status_code=500,
@@ -147,9 +136,6 @@ async def detect_entities_batch(
     request: BatchDetectionRequest,
 ) -> BatchDetectionResponse:
     """Detect entities in a batch of texts using specified detectors."""
-    if config is None:
-        raise HTTPException(status_code=500, detail="Server Error: No config present")
-
     if gliner is None:
         raise HTTPException(status_code=500, detail="Server Error: No GLiNER model loaded")
 
