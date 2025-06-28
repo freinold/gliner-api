@@ -104,14 +104,11 @@ async def detect_entities(
         )
 
     try:
-        threshold: float = request.threshold if request.threshold is not None else config.default_threshold
-        entities: list[str] = request.entity_types if request.entity_types else config.default_entities
-
         raw_entities: list[dict[str, Any]] = gliner.predict_entities(
             text=request.text,
-            labels=entities,
+            labels=request.entity_types,
             flat_ner=True,
-            threshold=threshold,
+            threshold=request.threshold,
             multi_label=False,
         )
 
@@ -140,14 +137,11 @@ async def detect_entities_batch(
         raise HTTPException(status_code=500, detail="Server Error: No GLiNER model loaded")
 
     try:
-        threshold: float = request.threshold if request.threshold is not None else config.default_threshold
-        entities: list[str] = request.entity_types if request.entity_types else config.default_entities
-
         raw_entities_list: list[list[dict[str, Any]]] = gliner.batch_predict_entities(
             texts=request.texts,
-            labels=entities,
+            labels=request.entity_types,
             flat_ner=True,
-            threshold=threshold,
+            threshold=request.threshold,
             multi_label=False,
         )
 
