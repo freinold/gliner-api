@@ -1,5 +1,9 @@
 from pydantic import AliasChoices, BaseModel, Field, TypeAdapter
 
+from gliner_api.config import Config, get_config
+
+config: Config = get_config()
+
 
 class ErrorMessage(BaseModel):
     error: str = Field(description="Short error code")
@@ -34,13 +38,13 @@ class DetectionRequest(BaseModel):
         description="Input text to analyze for entities",
         examples=["Sam Altman works at OpenAI in San Francisco."],
     )
-    threshold: float | None = Field(
-        default=None,
+    threshold: float = Field(
+        default=config.default_threshold,
         description="Threshold for entity detection; if not set, uses default threshold (see gliner config from /api/info endpoint)",
         examples=[0.5],
     )
-    entity_types: list[str] | None = Field(
-        default=None,
+    entity_types: list[str] = Field(
+        default=config.default_entities,
         description="List of entity types to detect; if not set, uses default entities (see gliner config from /api/info endpoint)",
         examples=[["person", "organization", "location"]],
     )
@@ -69,12 +73,12 @@ class BatchDetectionRequest(BaseModel):
             ],
         ],
     )
-    threshold: float | None = Field(
-        default=None,
+    threshold: float = Field(
+        default=config.default_threshold,
         description="Threshold for entity detection; if not set, uses default threshold (see gliner config from /api/info endpoint)",
     )
-    entity_types: list[str] | None = Field(
-        default=None,
+    entity_types: list[str] = Field(
+        default=config.default_entities,
         description="List of entity types to detect; if not set, uses default entities (see gliner config from /api/info endpoint)",
         examples=[["person", "organization", "location"]],
     )
@@ -109,24 +113,29 @@ class HealthCheckResponse(BaseModel):
 
 class InfoResponse(BaseModel):
     model_id: str = Field(
+        default=config.model_id,
         description="The Huggingface model ID for a GLiNER model.",
         examples=["knowledgator/gliner-x-base-v0.5"],
     )
     default_entities: list[str] = Field(
+        default=config.default_entities,
         description="The default entities to be detected, used if request includes no specific entities.",
         examples=[["person", "organization", "location"]],
     )
     default_threshold: float = Field(
+        default=config.default_threshold,
         description="The default threshold for entity detection, used if request includes no specific threshold.",
         examples=[0.5],
         ge=0.0,
         le=1.0,
     )
     api_key_required: bool = Field(
+        default=config.api_key is not None,
         description="Whether an API key is required for requests",
         examples=[False],
     )
     configured_use_case: str = Field(
+        default=config.use_case,
         description="The configured use case for this deployment",
         examples=["general"],
     )
