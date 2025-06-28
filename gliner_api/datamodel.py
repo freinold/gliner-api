@@ -48,6 +48,16 @@ class DetectionRequest(BaseModel):
         description="List of entity types to detect; if not set, uses default entities (see gliner config from /api/info endpoint)",
         examples=[["person", "organization", "location"]],
     )
+    flat_ner: bool = Field(
+        default=True,
+        description="Whether to return flat entities (default: True). If False, returns nested entities.",
+        examples=[True],
+    )
+    multi_label: bool = Field(
+        default=False,
+        description="Whether to allow multiple labels per entity (default: False). If True, there can be multiple entities returned for the same span.",
+        examples=[False],
+    )
 
 
 class DetectionResponse(BaseModel):
@@ -81,6 +91,16 @@ class BatchDetectionRequest(BaseModel):
         default=config.default_entities,
         description="List of entity types to detect; if not set, uses default entities (see gliner config from /api/info endpoint)",
         examples=[["person", "organization", "location"]],
+    )
+    flat_ner: bool = Field(
+        default=True,
+        description="Whether to return flat entities (default: True). If False, returns nested entities.",
+        examples=[True],
+    )
+    multi_label: bool = Field(
+        default=False,
+        description="Whether to allow multiple labels per entity (default: False). If True, there can be multiple entities returned for the same span.",
+        examples=[False],
     )
 
 
