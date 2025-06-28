@@ -24,21 +24,18 @@ from gliner_api.datamodel import (
 from gliner_api.logging import getLogger
 
 gliner: GLiNER | None = None
-config: Config | None = None
 
 logger: Logger = getLogger("gliner-api.backend")
+config: Config = get_config()
+logger.info(f"Loaded configuration for use case {config.use_case}.")
+logger.debug(f"Configuration:\n{config.model_dump_json(indent=2)}")
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """Lifespan event handler to initialize GLiNER model and configuration."""
-    global config
-    logger.info("Initializing GLiNER API...")
-    config = get_config()
-    logger.info(f"Loaded configuration for use case {config.use_case}.")
-    logger.debug(f"Configuration: {config}")
-
     global gliner
+    logger.info("Initializing GLiNER API...")
     logger.info(f"Loading GLiNER model {config.model_id}...")
     gliner = GLiNER.from_pretrained(config.model_id)
     logger.info("GLiNER model loaded.")
@@ -62,8 +59,6 @@ bearer: HTTPBearer = HTTPBearer(
 
 
 def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(dependency=bearer)) -> None:
-    if config is None:
-        raise HTTPException(status_code=500, detail="Server Error: No config present")
     if config.api_key is None:
         return
     if credentials.scheme.lower() != "bearer":
@@ -99,15 +94,6 @@ async def detect_entities(
     request: DetectionRequest,
 ) -> DetectionResponse:
     """Detect entities in text using specified detectors."""
-    if config is None:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "error": "ServerConfigError",
-                "message": "No config present",
-            },
-        )
-
     if gliner is None:
         raise HTTPException(
             status_code=500,
@@ -118,14 +104,11 @@ async def detect_entities(
         )
 
     try:
-        threshold: float = request.threshold if request.threshold is not None else config.default_threshold
-        entities: list[str] = request.entity_types if request.entity_types else config.default_entities
-
         raw_entities: list[dict[str, Any]] = gliner.predict_entities(
             text=request.text,
-            labels=entities,
+            labels=request.entity_types,
             flat_ner=True,
-            threshold=threshold,
+            threshold=request.threshold,
             multi_label=False,
         )
 
@@ -150,21 +133,15 @@ async def detect_entities_batch(
     request: BatchDetectionRequest,
 ) -> BatchDetectionResponse:
     """Detect entities in a batch of texts using specified detectors."""
-    if config is None:
-        raise HTTPException(status_code=500, detail="Server Error: No config present")
-
     if gliner is None:
         raise HTTPException(status_code=500, detail="Server Error: No GLiNER model loaded")
 
     try:
-        threshold: float = request.threshold if request.threshold is not None else config.default_threshold
-        entities: list[str] = request.entity_types if request.entity_types else config.default_entities
-
         raw_entities_list: list[list[dict[str, Any]]] = gliner.batch_predict_entities(
             texts=request.texts,
-            labels=entities,
+            labels=request.entity_types,
             flat_ner=True,
-            threshold=threshold,
+            threshold=request.threshold,
             multi_label=False,
         )
 
