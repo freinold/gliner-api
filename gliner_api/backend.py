@@ -24,21 +24,18 @@ from gliner_api.datamodel import (
 from gliner_api.logging import getLogger
 
 gliner: GLiNER | None = None
-config: Config | None = None
 
 logger: Logger = getLogger("gliner-api.backend")
+config: Config = get_config()
+logger.info(f"Loaded configuration for use case {config.use_case}.")
+logger.debug(f"Configuration:\n{config.model_dump_json(indent=2)}")
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """Lifespan event handler to initialize GLiNER model and configuration."""
-    global config
-    logger.info("Initializing GLiNER API...")
-    config = get_config()
-    logger.info(f"Loaded configuration for use case {config.use_case}.")
-    logger.debug(f"Configuration: {config}")
-
     global gliner
+    logger.info("Initializing GLiNER API...")
     logger.info(f"Loading GLiNER model {config.model_id}...")
     gliner = GLiNER.from_pretrained(config.model_id)
     logger.info("GLiNER model loaded.")
