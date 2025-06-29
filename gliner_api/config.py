@@ -16,7 +16,7 @@ class Config(BaseSettings):
         description="The Huggingface model ID for a GLiNER model. Browse available models at https://huggingface.co/models?library=gliner&sort=trending",
     )
     default_entities: list[str] = Field(
-        default=["person", "organization", "location"],
+        default=["person", "organization", "location", "date"],
         description="The default entities to be detected, used if request includes no specific entities.",
     )
     default_threshold: float = Field(
