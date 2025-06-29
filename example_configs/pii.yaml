@@ -1,6 +1,6 @@
 name: pii
 model: E3-JSI/gliner-multi-pii-domains-v1
-default_threshold: 0.5
+default_threshold: 0.25
 default_entities:
 - address
 - age
