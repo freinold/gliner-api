@@ -2,7 +2,6 @@
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   description: "Renovate config for freinold/gliner-api",
   extends: [
-    "config:recommended", // recommended configuration
     "config:best-practices", // best practices
     "customManagers:githubActionsVersions", // manages _VERSION variables in GitHub Action workflows
     "helpers:pinGitHubActionDigestsToSemver", // pin to digest with semver as comment
@@ -15,15 +14,16 @@
   packageRules: [
     {
       matchPackageNames: ["python"],
-      allowedVersions: "3.12.x"
+      allowedVersions: "3.12.x",
     },
-    { 
+    {
       matchDepTypes: ["requires-python"],
-      allowedVersions: "3.12.x"
-    }
+      allowedVersions: "3.12.x",
+    },
   ],
   lockFileMaintenance: {
-    enabled: true
-  }
+    enabled: true,
+  },
+  assignees: ["freinold"],
+  reviewers: ["freinold"],
 }
-
