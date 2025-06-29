@@ -36,7 +36,7 @@ class Entity(BaseModel):
 class DetectionRequest(BaseModel):
     text: str = Field(
         description="Input text to analyze for entities",
-        examples=["Sam Altman works at OpenAI in San Francisco."],
+        examples=["Steve Jobs founded Apple in Cupertino, California on April 1, 1976."],
     )
     threshold: float = Field(
         default=config.default_threshold,
@@ -46,7 +46,7 @@ class DetectionRequest(BaseModel):
     entity_types: list[str] = Field(
         default=config.default_entities,
         description="List of entity types to detect; if not set, uses default entities (see gliner config from /api/info endpoint)",
-        examples=[["person", "organization", "location"]],
+        examples=[["person", "organization", "location", "date"]],
     )
     flat_ner: bool = Field(
         default=True,
@@ -65,9 +65,11 @@ class DetectionResponse(BaseModel):
         description="List of detected entities in the input text",
         examples=[
             [
-                Entity(start=0, end=10, text="Sam Altman", type="person", score=0.95),
-                Entity(start=20, end=26, text="OpenAI", type="organization", score=0.98),
-                Entity(start=30, end=43, text="San Francisco", type="location", score=0.92),
+                Entity(start=0, end=10, text="Steve Jobs", type="person", score=0.99),
+                Entity(start=19, end=24, text="Apple", type="organization", score=0.98),
+                Entity(start=28, end=37, text="Cupertino", type="location", score=0.98),
+                Entity(start=39, end=49, text="California", type="location", score=0.99),
+                Entity(start=53, end=66, text="April 1, 1976", type="date", score=0.68),
             ]
         ],
     )
@@ -78,19 +80,20 @@ class BatchDetectionRequest(BaseModel):
         description="List of input texts to analyze for entities",
         examples=[
             [
-                "Sam Altman works at OpenAI in San Francisco.",
-                "Queen Elizabeth was the head of the Windsor family and resided in London.",
+                "Steve Jobs founded Apple in Cupertino, California on April 1, 1976.",
+                "Until her death in 2022, the head of the Windsor family, Queen Elizabeth, resided in London.",
             ],
         ],
     )
     threshold: float = Field(
         default=config.default_threshold,
         description="Threshold for entity detection; if not set, uses default threshold (see gliner config from /api/info endpoint)",
+        examples=[0.3],
     )
     entity_types: list[str] = Field(
         default=config.default_entities,
         description="List of entity types to detect; if not set, uses default entities (see gliner config from /api/info endpoint)",
-        examples=[["person", "organization", "location"]],
+        examples=[["person", "organization", "location", "date"]],
     )
     flat_ner: bool = Field(
         default=True,
@@ -110,14 +113,17 @@ class BatchDetectionResponse(BaseModel):
         examples=[
             [
                 [
-                    Entity(start=0, end=10, text="Sam Altman", type="person", score=0.95),
-                    Entity(start=20, end=26, text="OpenAI", type="organization", score=0.98),
-                    Entity(start=30, end=43, text="San Francisco", type="location", score=0.92),
+                    Entity(start=0, end=10, text="Steve Jobs", type="person", score=0.99),
+                    Entity(start=19, end=24, text="Apple", type="organization", score=0.98),
+                    Entity(start=28, end=37, text="Cupertino", type="location", score=0.98),
+                    Entity(start=39, end=49, text="California", type="location", score=0.99),
+                    Entity(start=53, end=66, text="April 1, 1976", type="date", score=0.68),
                 ],
                 [
-                    Entity(start=0, end=13, text="Queen Elizabeth", type="person", score=0.97),
-                    Entity(start=30, end=47, text="Windsor family", type="organization", score=0.62),
-                    Entity(start=41, end=47, text="London", type="location", score=0.93),
+                    Entity(start=19, end=23, text="2022", type="date", score=0.38),
+                    Entity(start=41, end=55, text="Windsor family", type="organization", score=0.90),
+                    Entity(start=57, end=72, text="Queen Elizabeth", type="person", score=0.99),
+                    Entity(start=85, end=91, text="London", type="location", score=0.99),
                 ],
             ]
         ],
@@ -140,7 +146,7 @@ class InfoResponse(BaseModel):
     default_entities: list[str] = Field(
         default=config.default_entities,
         description="The default entities to be detected, used if request includes no specific entities.",
-        examples=[["person", "organization", "location"]],
+        examples=[["person", "organization", "location", "date"]],
     )
     default_threshold: float = Field(
         default=config.default_threshold,
