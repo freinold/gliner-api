@@ -1,5 +1,5 @@
 name: medical
-model: Ihor/gliner-biomed-large-v1.0
+model_id: Ihor/gliner-biomed-large-v1.0
 default_threshold: 0.3
 default_entities:
 - anatomy
