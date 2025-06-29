@@ -1,7 +1,7 @@
 name: gliner-api
 services:
   gliner-api:
-    image: ghcr.io/freinold/gliner-api:0.1.0-rc4
+    image: ghcr.io/freinold/gliner-api:0.1.0-rc4@sha256:b61c4f03952340a6cf1156f750f58829571d2e004c35f5714b76158434ed1013
     ports:
       - "8080:8080"
     volumes:
