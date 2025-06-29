@@ -548,6 +548,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "gitpython" },
+    { name = "huggingface-hub" },
     { name = "pydantic-settings" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -577,6 +578,7 @@ requires-dist = [
     { name = "gitpython", specifier = "==3.1.44" },
     { name = "gliner", extras = ["gpu", "tokenizers"], marker = "extra == 'gpu'", specifier = "==0.2.21" },
     { name = "gliner", extras = ["tokenizers"], marker = "extra == 'cpu'", specifier = "==0.2.21" },
+    { name = "huggingface-hub", specifier = ">=0.33.1" },
     { name = "pydantic-settings", specifier = "==2.10.1" },
     { name = "torch", marker = "extra == 'cpu'", specifier = "==2.7.1", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "gliner-api", extra = "cpu" } },
     { name = "torch", marker = "extra == 'gpu'", specifier = "==2.7.1", index = "https://download.pytorch.org/whl/cu128", conflict = { package = "gliner-api", extra = "gpu" } },
