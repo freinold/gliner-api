@@ -18,7 +18,7 @@ configs:
     # Alternatively, you can define the config inline:
     # content: |
     #   name: general
-    #   model: knowledgator/gliner-x-base-v0.5
+    #   model_id: knowledgator/gliner-x-base-v0.5
     #   default_threshold: 0.5
     #   default_entities:
     #   - person
