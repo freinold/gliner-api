@@ -122,7 +122,7 @@ async def detect_entities(
 @app.post(
     path="/api/batch",
     responses={
-        200: {"model": DetectionResponse},
+        200: {"model": BatchDetectionResponse},
         401: {"model": ErrorMessage},
         403: {"model": ErrorMessage},
         500: {"model": ErrorMessage},
