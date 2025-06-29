@@ -93,7 +93,7 @@ async def docs_forward() -> RedirectResponse:
 async def detect_entities(
     request: DetectionRequest,
 ) -> DetectionResponse:
-    """Detect entities in text using specified detectors."""
+    """Detect entities in single text."""
     if gliner is None:
         raise HTTPException(
             status_code=500,
@@ -132,7 +132,7 @@ async def detect_entities(
 async def detect_entities_batch(
     request: BatchDetectionRequest,
 ) -> BatchDetectionResponse:
-    """Detect entities in a batch of texts using specified detectors."""
+    """Detect entities multiple of texts."""
     if gliner is None:
         raise HTTPException(status_code=500, detail="Server Error: No GLiNER model loaded")
 
