@@ -24,6 +24,5 @@
   lockFileMaintenance: {
     enabled: true,
   },
-  assignees: ["freinold"],
   reviewers: ["freinold"],
 }
