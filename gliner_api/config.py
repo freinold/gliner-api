@@ -1,18 +1,19 @@
 from functools import lru_cache
 
-from pydantic import AliasChoices, Field
+from huggingface_hub import HfApi, ModelInfo
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, CliSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict, YamlConfigSettingsSource
 
 
 class Config(BaseSettings):
     use_case: str = Field(
         default="general",
-        description="The use case for the GLiNER model, used to load specific configurations.",
+        description="The use case for the GLiNER model, useful for describing the intended application or domain.",
         validation_alias=AliasChoices("use_case", "name"),
     )
     model_id: str = Field(
         default="knowledgator/gliner-x-base-v0.5",
-        description="The Huggingface model ID for a GLiNER model.",
+        description="The Huggingface model ID for a GLiNER model. Browse available models at https://huggingface.co/models?library=gliner&sort=trending",
     )
     default_entities: list[str] = Field(
         default=["person", "organization", "location"],
@@ -69,6 +70,20 @@ class Config(BaseSettings):
             YamlConfigSettingsSource(settings_cls),
             dotenv_settings,
         )
+
+    @field_validator("model_id")
+    @classmethod
+    def validate_model_id(cls, v: str) -> str:
+        try:
+            hf_api: HfApi = HfApi()
+            info: ModelInfo = hf_api.model_info(v)
+            if info.library_name is None or info.library_name.lower() != "gliner":
+                raise ValueError(
+                    f"Model {v} is not a GLiNER model. Check for compatible models at https://huggingface.co/models?library=gliner&sort=trending"
+                )
+        except Exception as e:
+            raise ValueError(f"Failed to validate model ID {v}: {e}")
+        return v
 
 
 @lru_cache
