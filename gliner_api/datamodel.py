@@ -146,7 +146,7 @@ class InfoResponse(BaseModel):
     default_entities: list[str] = Field(
         default=config.default_entities,
         description="The default entities to be detected, used if request includes no specific entities.",
-        examples=[["person", "organization", "location"]],
+        examples=[["person", "organization", "location", "date"]],
     )
     default_threshold: float = Field(
         default=config.default_threshold,
