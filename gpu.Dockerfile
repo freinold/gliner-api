@@ -1,5 +1,5 @@
 # Use a full image with uv pre-installed as builder
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:a92a4ab5b4555641d2986ce57883cde463a999f22210e9d7cc3ea50397f63454 AS builder
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:958a7091e10a30d089d9cdf5681688cce0d5fca581504d4903ce92e6e78cbea4 AS builder
 
 # Install build tools needed for some packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --no-dev --extra gpu --compile-bytecode
 
 # Use slim image as runner
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:a92a4ab5b4555641d2986ce57883cde463a999f22210e9d7cc3ea50397f63454 AS runner
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:958a7091e10a30d089d9cdf5681688cce0d5fca581504d4903ce92e6e78cbea4 AS runner
 
 # Metadata for the image
 LABEL org.opencontainers.image.authors='Fabian Reinold <contact@freinold.eu>' \
