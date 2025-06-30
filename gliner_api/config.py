@@ -12,7 +12,7 @@ class Config(BaseSettings):
         validation_alias=AliasChoices("use_case", "name"),
     )
     model_id: str = Field(
-        default="knowledgator/gliner-x-base-v0.5",
+        default="knowledgator/gliner-x-base",
         description="The Huggingface model ID for a GLiNER model. Browse available models at https://huggingface.co/models?library=gliner&sort=trending",
     )
     default_entities: list[str] = Field(

@@ -1,5 +1,7 @@
 name: general
-model_id: knowledgator/gliner-x-base-v0.5
+# Alternatively, you can also use `knowledgator/gliner-x-large` or `knowledgator/gliner-x-small`
+# See collection here: https://huggingface.co/collections/freinold/gliner-general-models-68619eeb94640fe6cf14648d
+model_id: knowledgator/gliner-x-base
 default_threshold: 0.5
 default_entities:
 - person

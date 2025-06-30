@@ -141,7 +141,7 @@ class InfoResponse(BaseModel):
     model_id: str = Field(
         default=config.model_id,
         description="The Huggingface model ID for a GLiNER model.",
-        examples=["knowledgator/gliner-x-base-v0.5"],
+        examples=["knowledgator/gliner-x-base"],
     )
     default_entities: list[str] = Field(
         default=config.default_entities,
