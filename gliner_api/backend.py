@@ -39,7 +39,12 @@ async def lifespan(_: FastAPI):
     logger.info("Initializing GLiNER API...")
     logger.info(f"Loading GLiNER model {config.model_id}...")
     try:
-        gliner = GLiNER.from_pretrained(config.model_id)
+        gliner = GLiNER.from_pretrained(
+            config.model_id,
+            load_onnx_model=config.onnx_enabled,
+            load_tokenizer=True,
+            onnx_model_file=config.onnx_model_path,
+        )
         gliner.eval()
         logger.info("GLiNER model loaded.")
     except Exception as e:
@@ -177,4 +182,5 @@ async def info() -> InfoResponse:
         default_entities=config.default_entities,
         default_threshold=config.default_threshold,
         configured_use_case=config.use_case,
+        onnx_enabled=config.onnx_enabled,
     )

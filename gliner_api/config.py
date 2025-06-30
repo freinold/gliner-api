@@ -15,6 +15,14 @@ class Config(BaseSettings):
         default="knowledgator/gliner-x-base",
         description="The Huggingface model ID for a GLiNER model. Browse available models at https://huggingface.co/models?library=gliner&sort=trending",
     )
+    onnx_enabled: bool = Field(
+        default=False,
+        description="Whether to use ONNX for inference. If enabled, the model will be loaded in ONNX format for potentially faster inference.",
+    )
+    onnx_model_path: str = Field(
+        default="model.onnx",
+        description="The file path for the ONNX model. This is used if onnx_enabled is set to True. Some models are also provided in quantized ONNX format, e.g. `model_quantized.onnx`.",
+    )
     default_entities: list[str] = Field(
         default=["person", "organization", "location", "date"],
         description="The default entities to be detected, used if request includes no specific entities.",
