@@ -1,4 +1,4 @@
-name: general-onnx
+name: general-onnx-quantized
 # Alternatively, you can also use `knowledgator/gliner-x-large` or `knowledgator/gliner-x-small`
 # See collection here: https://huggingface.co/collections/freinold/gliner-general-models-68619eeb94640fe6cf14648d
 model_id: knowledgator/gliner-x-base
