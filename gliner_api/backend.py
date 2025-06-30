@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from logging import Logger
 from sys import exit as sys_exit
+from time import process_time
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from gliner import GLiNER
@@ -104,6 +105,7 @@ async def docs_forward() -> RedirectResponse:
 )
 async def detect_entities(
     request: DetectionRequest,
+    response: Response,
 ) -> DetectionResponse:
     """Detect entities in a single text."""
     if gliner is None:
@@ -115,7 +117,11 @@ async def detect_entities(
             },
         )
 
+    text_length: int = len(request.text)
+    response.headers["X-Text-Length"] = str(text_length)
+
     try:
+        start_time: float = process_time()
         raw_entities: list[dict[str, Any]] = gliner.predict_entities(
             text=request.text,
             labels=request.entity_types,
@@ -123,8 +129,13 @@ async def detect_entities(
             threshold=request.threshold,
             multi_label=request.multi_label,
         )
+        inference_time: float = process_time() - start_time
+        response.headers["X-Inference-Time"] = f"{inference_time:.4f}"
+        logger.debug(f"Entity detection took {inference_time:.4f} seconds for text of length {text_length}.")
 
         parsed_entities: list[Entity] = entity_list_adapter.validate_python(raw_entities)
+        response.headers["X-Entity-Count"] = str(len(parsed_entities))
+
         return DetectionResponse(entities=parsed_entities)
 
     except Exception as e:
@@ -143,12 +154,17 @@ async def detect_entities(
 )
 async def detect_entities_batch(
     request: BatchDetectionRequest,
+    response: Response,
 ) -> BatchDetectionResponse:
     """Detect entities in multiple texts."""
     if gliner is None:
         raise HTTPException(status_code=500, detail="Server Error: No GLiNER model loaded")
 
+    total_text_length: int = sum(len(text) for text in request.texts)
+    response.headers["X-Text-Length"] = str(total_text_length)
+
     try:
+        start_time: float = process_time()
         raw_entities_list: list[list[dict[str, Any]]] = gliner.batch_predict_entities(
             texts=request.texts,
             labels=request.entity_types,
@@ -156,8 +172,15 @@ async def detect_entities_batch(
             threshold=request.threshold,
             multi_label=request.multi_label,
         )
+        inference_time: float = process_time() - start_time
+        response.headers["X-Inference-Time"] = f"{inference_time:.4f}"
+        logger.debug(
+            f"Batch entity detection took {inference_time:.4f} seconds for {len(request.texts)} texts of total length {total_text_length}."
+        )
 
         parsed_entities_list: list[list[Entity]] = deep_entity_list_adapter.validate_python(raw_entities_list)
+        response.headers["X-Entity-Count"] = str(sum(len(entities) for entities in parsed_entities_list))
+
         return BatchDetectionResponse(entities=parsed_entities_list)
 
     except Exception as e:
