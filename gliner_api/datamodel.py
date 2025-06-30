@@ -165,6 +165,11 @@ class InfoResponse(BaseModel):
         description="The configured use case for this deployment",
         examples=["general"],
     )
+    onnx_enabled: bool = Field(
+        default=config.onnx_enabled,
+        description="Whether the GLiNER model is loaded as an ONNX model",
+        examples=[False],
+    )
 
 
 # Define TypeAdapter for Entity list once and reuse it
