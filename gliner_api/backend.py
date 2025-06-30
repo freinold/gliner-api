@@ -182,4 +182,5 @@ async def info() -> InfoResponse:
         default_entities=config.default_entities,
         default_threshold=config.default_threshold,
         configured_use_case=config.use_case,
+        onnx_enabled=config.onnx_enabled,
     )
