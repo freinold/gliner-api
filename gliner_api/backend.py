@@ -115,6 +115,8 @@ async def detect_entities(
     response: Response,
 ) -> DetectionResponse:
     """Detect entities in a single text."""
+    requests_metric.labels("POST", "/api/invoke").inc()
+
     if gliner is None:
         raise HTTPException(
             status_code=500,
@@ -167,6 +169,7 @@ async def detect_entities_batch(
 ) -> BatchDetectionResponse:
     """Detect entities in multiple texts."""
     requests_metric.labels("POST", "/api/batch").inc()
+
     if gliner is None:
         raise HTTPException(status_code=500, detail="Server Error: No GLiNER model loaded")
 
