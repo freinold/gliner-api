@@ -1,5 +1,7 @@
 name: medical
-model_id: Ihor/gliner-biomed-large-v1.0
+# Alternatively, you can also use `Ihor/gliner-biomed-large-v1.0` or `Ihor/gliner-biomed-small-v1.0`
+# See collection here: https://huggingface.co/collections/freinold/gliner-medical-models-68617f14bf160be6a4f877e5
+model_id: Ihor/gliner-biomed-base-v1.0
 default_threshold: 0.3
 default_entities:
 - anatomy
