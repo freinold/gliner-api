@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from logging import Logger
+from sys import exit as sys_exit
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -37,8 +38,14 @@ async def lifespan(_: FastAPI):
     global gliner
     logger.info("Initializing GLiNER API...")
     logger.info(f"Loading GLiNER model {config.model_id}...")
-    gliner = GLiNER.from_pretrained(config.model_id)
-    logger.info("GLiNER model loaded.")
+    try:
+        gliner = GLiNER.from_pretrained(config.model_id)
+        gliner.eval()
+        logger.info("GLiNER model loaded.")
+    except Exception as e:
+        logger.exception("Failed to load GLiNER model", exc_info=e)
+        sys_exit(1)
+
     yield
 
     gliner = None
