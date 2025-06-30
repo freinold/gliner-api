@@ -47,6 +47,10 @@ class Config(BaseSettings):
         le=65535,
         description="The port number for serving the API.",
     )
+    metrics_enabled: bool = Field(
+        default=True,
+        description="Whether to enable Prometheus metrics for the API. If enabled, metrics will be available at /metrics endpoint.",
+    )
 
     # pydantic_settings configuration starts here
     model_config = SettingsConfigDict(
