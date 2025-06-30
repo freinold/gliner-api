@@ -24,6 +24,7 @@ from gliner_api.datamodel import (
     entity_list_adapter,
 )
 from gliner_api.logging import getLogger
+from gliner_api.metrics import app_state_metric, failed_auth_metric, failed_inference_metric, inference_time_metric, requests_metric
 
 gliner: GLiNER | None = None
 
@@ -36,6 +37,7 @@ logger.debug(f"Configuration:\n{config.model_dump_json(indent=2)}")
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """Lifespan event handler to initialize GLiNER model and configuration."""
+    app_state_metric.state("starting")
     global gliner
     logger.info("Initializing GLiNER API...")
     logger.info(f"Loading GLiNER model {config.model_id}...")
@@ -52,8 +54,10 @@ async def lifespan(_: FastAPI):
         logger.exception("Failed to load GLiNER model", exc_info=e)
         sys_exit(1)
 
+    app_state_metric.state("running")
     yield
 
+    app_state_metric.state("stopping")
     gliner = None
 
 
@@ -71,6 +75,7 @@ bearer: HTTPBearer = HTTPBearer(
 )
 
 
+@failed_auth_metric.count_exceptions(HTTPException)
 def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(dependency=bearer)) -> None:
     if config.api_key is None:
         return
@@ -90,6 +95,8 @@ def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(dependenc
 
 @app.get(path="/", include_in_schema=False)
 async def docs_forward() -> RedirectResponse:
+    """Redirect root path to API documentation."""
+    requests_metric.labels("GET", "/docs").inc()
     return RedirectResponse(url="/docs")
 
 
@@ -130,6 +137,7 @@ async def detect_entities(
             multi_label=request.multi_label,
         )
         inference_time: float = process_time() - start_time
+        inference_time_metric.labels("POST", "/api/invoke").observe(inference_time)
         response.headers["X-Inference-Time"] = f"{inference_time:.4f}"
         logger.debug(f"Entity detection took {inference_time:.4f} seconds for text of length {text_length}.")
 
@@ -139,6 +147,7 @@ async def detect_entities(
         return DetectionResponse(entities=parsed_entities)
 
     except Exception as e:
+        failed_inference_metric.labels("POST", "/api/invoke").inc()
         raise HTTPException(status_code=500, detail=str(object=e))
 
 
@@ -157,6 +166,7 @@ async def detect_entities_batch(
     response: Response,
 ) -> BatchDetectionResponse:
     """Detect entities in multiple texts."""
+    requests_metric.labels("POST", "/api/batch").inc()
     if gliner is None:
         raise HTTPException(status_code=500, detail="Server Error: No GLiNER model loaded")
 
@@ -173,6 +183,7 @@ async def detect_entities_batch(
             multi_label=request.multi_label,
         )
         inference_time: float = process_time() - start_time
+        inference_time_metric.labels("POST", "/api/batch").observe(inference_time)
         response.headers["X-Inference-Time"] = f"{inference_time:.4f}"
         logger.debug(
             f"Batch entity detection took {inference_time:.4f} seconds for {len(request.texts)} texts of total length {total_text_length}."
@@ -184,21 +195,21 @@ async def detect_entities_batch(
         return BatchDetectionResponse(entities=parsed_entities_list)
 
     except Exception as e:
+        failed_inference_metric.labels("POST", "/api/batch").inc()
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/health")
 async def health_check() -> HealthCheckResponse:
     """Health check endpoint."""
+    requests_metric.labels("GET", "/api/health").inc()
     return HealthCheckResponse(status="healthy")
 
 
 @app.get("/api/info")
 async def info() -> InfoResponse:
     """Information on configured model and default settings."""
-    if config is None:
-        raise HTTPException(status_code=500, detail="Server Error: No config present")
-
+    requests_metric.labels("GET", "/api/info").inc()
     return InfoResponse(
         api_key_required=config.api_key is not None,
         model_id=config.model_id,
