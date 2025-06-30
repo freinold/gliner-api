@@ -38,6 +38,7 @@ async def lifespan(_: FastAPI):
     logger.info("Initializing GLiNER API...")
     logger.info(f"Loading GLiNER model {config.model_id}...")
     gliner = GLiNER.from_pretrained(config.model_id)
+    gliner.eval()
     logger.info("GLiNER model loaded.")
     yield
 
