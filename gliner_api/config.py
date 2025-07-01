@@ -51,6 +51,10 @@ class Config(BaseSettings):
         default=True,
         description="Whether to enable Prometheus metrics for the API. If enabled, metrics will be available at /metrics endpoint.",
     )
+    frontend_enabled: bool = Field(
+        default=True,
+        description="Whether to enable the Gradio frontend for the API. If enabled, the frontend will be available at server root.",
+    )
 
     # pydantic_settings configuration starts here
     model_config = SettingsConfigDict(

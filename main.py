@@ -16,6 +16,19 @@ def main() -> None:
     if config.metrics_enabled:
         app.mount("/metrics", metrics_app)
 
+    if config.frontend_enabled:
+        from fastapi.staticfiles import StaticFiles
+        from gradio import mount_gradio_app
+
+        from gliner_api.frontend import client, interface
+
+        app.mount("/static", StaticFiles(directory="static"), name="static")
+        mount_gradio_app(app, interface, path="", show_api=False)
+
+        @app.on_event("shutdown")
+        async def close_httpx_client():
+            await client.aclose()
+
     uvicorn.run(
         app,
         host=config.host,

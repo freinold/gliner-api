@@ -62,7 +62,7 @@ async def lifespan(_: FastAPI):
 
 
 app: FastAPI = FastAPI(
-    title="GLiNER Detection API",
+    title="GLiNER API - Backend",
     description="API for GLiNER entity detection",
     version="0.1.0",
     lifespan=lifespan,
@@ -93,11 +93,13 @@ def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(dependenc
     return
 
 
-@app.get(path="/", include_in_schema=False)
-async def docs_forward() -> RedirectResponse:
-    """Redirect root path to API documentation."""
-    requests_metric.labels("GET", "/docs").inc()
-    return RedirectResponse(url="/docs")
+if not config.frontend_enabled:
+    # Enable docs forward if we got no frontend
+    @app.get(path="/", include_in_schema=False)
+    async def docs_forward() -> RedirectResponse:
+        """Redirect root path to API documentation."""
+        requests_metric.labels("GET", "/docs").inc()
+        return RedirectResponse(url="/docs")
 
 
 @app.post(
