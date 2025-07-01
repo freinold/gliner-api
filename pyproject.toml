@@ -7,18 +7,16 @@ requires-python = "==3.12.11"
 dependencies = [
     "fastapi[standard]==0.115.14",
     "gitpython==3.1.44",
-    "gradio>=5.35.0",
-    "httpx>=0.28.1",
     "huggingface-hub==0.33.1",
     "prometheus-client==0.22.1",
     "pydantic-settings==2.10.1",
-    "stamina>=25.1.0",
     "uvicorn[standard]==0.35.0",
 ]
 
 [project.optional-dependencies]
 cpu = ["torch==2.7.1", "gliner[tokenizers]==0.2.21"]
 gpu = ["torch==2.7.1", "gliner[gpu,tokenizers]==0.2.21"]
+frontend = ["gradio>=5.35.0", "httpx>=0.28.1", "stamina>=25.1.0"]
 
 [tool.uv]
 conflicts = [[{ extra = "cpu" }, { extra = "gpu" }]]
