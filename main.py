@@ -6,7 +6,7 @@ from gradio import mount_gradio_app
 
 from gliner_api.backend import app
 from gliner_api.config import Config, get_config
-from gliner_api.frontend import interface
+from gliner_api.frontend import client, interface
 from gliner_api.logging import getLogger
 from gliner_api.metrics import metrics_app
 
@@ -22,6 +22,10 @@ def main() -> None:
     if config.frontend_enabled:
         app.mount("/static", StaticFiles(directory="static"), name="static")
         mount_gradio_app(app, interface, path="", show_api=False)
+
+        @app.on_event("shutdown")
+        async def close_httpx_client():
+            await client.aclose()
 
     uvicorn.run(
         app,
