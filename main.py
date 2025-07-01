@@ -1,9 +1,12 @@
 from logging import Logger
 
 import uvicorn
+from fastapi.staticfiles import StaticFiles
+from gradio import mount_gradio_app
 
 from gliner_api.backend import app
 from gliner_api.config import Config, get_config
+from gliner_api.frontend import interface
 from gliner_api.logging import getLogger
 from gliner_api.metrics import metrics_app
 
@@ -15,6 +18,10 @@ def main() -> None:
     """Run the GLiNER API server."""
     if config.metrics_enabled:
         app.mount("/metrics", metrics_app)
+
+    if config.frontend_enabled:
+        app.mount("/static", StaticFiles(directory="static"), name="static")
+        mount_gradio_app(app, interface, path="", show_api=False)
 
     uvicorn.run(
         app,
