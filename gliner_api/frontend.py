@@ -17,10 +17,11 @@ client: AsyncClient = AsyncClient(
 
 async def call_invoke(text: str) -> tuple[dict[str, str | list[dict[str, Any]]], list[dict[str, Any]]]:
     """Call the /api/invoke endpoint with the provided text."""
+    response: Response | None = None
     try:
         async for attempt in retry_context(on=HTTPError):
             with attempt:
-                response: Response = await client.post("/api/invoke", json={"text": text})
+                response = await client.post("/api/invoke", json={"text": text})
                 response.raise_for_status()
 
     except HTTPError as e:
@@ -30,6 +31,8 @@ async def call_invoke(text: str) -> tuple[dict[str, str | list[dict[str, Any]]],
         raise gr.Error(message=f"An unexpected error occurred: {e}")
 
     try:
+        if response is None:
+            raise gr.Error(message="No response received from the server.")
         response_data: dict[str, Any] = response.json()
     except Exception as e:
         raise gr.Error(message=f"Failed to parse response JSON: {e}")
