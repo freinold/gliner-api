@@ -4,26 +4,12 @@ services:
     image: ghcr.io/freinold/gliner-api:0.1.0-rc4@sha256:b61c4f03952340a6cf1156f750f58829571d2e004c35f5714b76158434ed1013
     ports:
       - "8080:8080"
-    volumes:
-      - "${HOME}/.cache/huggingface:/app/huggingface"
     stdin_open: true
     tty: true
-    configs:
-      - source: app_config
-        target: /app/config.yaml
-
-configs:
-  app_config:
-    file: example_configs/pii.yaml
-    # Alternatively, you can define the config inline:
-    # content: |
-    #   name: general
-    #   model_id: knowledgator/gliner-x-base
-    #   default_threshold: 0.5
-    #   default_entities:
-    #   - person
-    #   - organization
-    #   - location
-    #   api_key: null
-    #   host: "0.0.0.0"
-    #   port: 8080
+    volumes:
+      - "${HOME}/.cache/huggingface:/app/huggingface"
+      - "./example_configs/pii.yaml:/app/config.yaml:ro"
+    environment:
+      []
+      # If you want to secure your API, set your key here
+      # - GLINER_API_API_KEY=CHANGEME
