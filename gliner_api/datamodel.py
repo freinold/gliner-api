@@ -36,7 +36,7 @@ class Entity(BaseModel):
 class DetectionRequest(BaseModel):
     text: str = Field(
         description="Input text to analyze for entities",
-        examples=["Steve Jobs founded Apple in Cupertino, California on April 1, 1976."],
+        examples=["Steve Jobs founded Apple Inc. in Cupertino, CA on April 1, 1976."],
     )
     threshold: float = Field(
         default=config.default_threshold,
@@ -80,7 +80,7 @@ class BatchDetectionRequest(BaseModel):
         description="List of input texts to analyze for entities",
         examples=[
             [
-                "Steve Jobs founded Apple in Cupertino, California on April 1, 1976.",
+                "Steve Jobs founded Apple Inc. in Cupertino, CA on April 1, 1976.",
                 "Until her death in 2022, the head of the Windsor family, Queen Elizabeth, resided in London.",
             ],
         ],
