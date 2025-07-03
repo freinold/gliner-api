@@ -68,11 +68,13 @@ async def call_invoke(
     return {"entities": gradio_entities, "text": text}, entities
 
 
-description: str = """
+description: str = f"""
 <div style='text-align: center;'>
     <img src='/static/logo.png' alt='GLiNER Logo' style='height: 50px; width: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;'>
     <div>
-        A simple frontend for the GLiNER entity detection API.
+        A simple frontend for the GLiNER entity detection API.<br>
+        This interface allows you to detect named entities in text using GLiNER's powerful models.<br>
+        Currently loaded model: <strong><a href='https://huggingface.co/{config.model_id}'>{config.model_id}</a></strong><br>
     </div>
 </div>
 """
@@ -91,6 +93,7 @@ interface = gr.Interface(
             placeholder="Enter text...",
             lines=5,
             max_lines=15,
+            value="Steve Jobs founded Apple Inc. in Cupertino, CA on April 1, 1976.",
             info="Text to analyze for named entities.",
         ),
         gr.Slider(
@@ -127,7 +130,7 @@ interface = gr.Interface(
     description=description,
     article=article,
     examples=[
-        ["Steve Jobs founded Apple in Cupertino, California on April 1, 1976."],
+        ["Steve Jobs founded Apple Inc. in Cupertino, CA on April 1, 1976."],
         ["Until her death in 2022, the head of the Windsor family, Queen Elizabeth, resided in London."],
         ["The Eiffel Tower was completed in 1889 and is located in Paris, France."],
         ["Barack Obama served as the 44th President of the United States from 2009 to 2017."],
