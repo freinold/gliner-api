@@ -20,7 +20,7 @@ async def call_invoke(
     threshold: float,
     entity_types: list[str],
     additional_options: list[str],
-) -> tuple[dict[str, str | list[dict[str, Any]]], list[dict[str, Any]]]:
+) -> tuple[dict[str, str | list[dict[str, Any]]], str, list[dict[str, Any]]]:
     """Call the /api/invoke endpoint with the provided text."""
     flat_ner: bool = "deep_ner" not in additional_options
     multi_label: bool = "multi_label" in additional_options
@@ -49,11 +49,13 @@ async def call_invoke(
     try:
         if response is None:
             raise gr.Error(message="No response received from the server.")
-        response_data: dict[str, Any] = response.json()
+        response_body: dict[str, Any] = response.json()
+        inference_time: float = float(response.headers.get("X-Inference-Time", "0.0"))
+
     except Exception as e:
         raise gr.Error(message=f"Failed to parse response JSON: {e}")
 
-    entities: list[dict[str, Any]] | None = response_data.get("entities")
+    entities: list[dict[str, Any]] | None = response_body.get("entities")
 
     if entities is None:
         raise gr.Error(message="Corrupted response: 'entities' field is missing.")
@@ -65,12 +67,12 @@ async def call_invoke(
         if "type" in entity:
             entity["entity"] = entity.pop("type")
 
-    return {"entities": gradio_entities, "text": text}, entities
+    return {"entities": gradio_entities, "text": text}, f"{inference_time:.2f} seconds", entities
 
 
 description: str = f"""
 <div style='text-align: center;'>
-    <img src='/static/logo.png' alt='GLiNER Logo' style='height: 50px; width: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;'>
+    <img src='/static/logo_border.png' alt='GLiNER Logo' style='height: auto; width: 100px; display: block; margin: auto;'>
     <div>
         A simple frontend for the GLiNER entity detection API.<br>
         This interface allows you to detect named entities in text using GLiNER's powerful models.<br>
@@ -81,7 +83,8 @@ description: str = f"""
 
 article: str = """
 <div style='text-align: center;'>
-    See the <a href='/docs'>API documentation</a> for more details on how to use the GLiNER API from your programs or scripts.
+    See the <a href='/docs'>API documentation</a> for more details on how to use the GLiNER API from your programs or scripts.<br>
+    <b>This project is licensed under MIT-License and can be found on <a href='https://github.com/freinold/GLiNER-API'>GitHub</a>.</b>
 </div>
 """
 
@@ -90,8 +93,8 @@ interface = gr.Interface(
     inputs=[
         gr.Textbox(
             label="Input Text",
-            placeholder="Enter text...",
-            lines=5,
+            placeholder="Enter text...\nYou can also paste longer texts here.",
+            lines=3,
             max_lines=15,
             value="Steve Jobs founded Apple Inc. in Cupertino, CA on April 1, 1976.",
             info="Text to analyze for named entities.",
@@ -123,8 +126,11 @@ interface = gr.Interface(
         ),
     ],
     outputs=[
-        gr.HighlightedText(label="Detected Entities"),
-        gr.JSON(label="Raw Response Payload"),
+        gr.HighlightedText(
+            label="Detected Entities",
+        ),
+        gr.Label(label="Inference Time"),
+        gr.JSON(label="Raw Response Body"),
     ],
     title="GLiNER API - Frontend",
     description=description,
