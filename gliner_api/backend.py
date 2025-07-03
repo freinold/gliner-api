@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from logging import Logger
 from sys import exit as sys_exit
-from time import process_time
+from time import perf_counter
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Response
@@ -132,7 +132,7 @@ async def detect_entities(
     response.headers["X-Text-Length"] = str(text_length)
 
     try:
-        start_time: float = process_time()
+        start_time: float = perf_counter()
         raw_entities: list[dict[str, Any]] = gliner.predict_entities(
             text=request.text,
             labels=request.entity_types,
@@ -140,7 +140,7 @@ async def detect_entities(
             threshold=request.threshold,
             multi_label=request.multi_label,
         )
-        inference_time: float = process_time() - start_time
+        inference_time: float = perf_counter() - start_time
         inference_time_metric.labels("POST", "/api/invoke").observe(inference_time)
         response.headers["X-Inference-Time"] = f"{inference_time:.4f}"
         logger.debug(f"Entity detection took {inference_time:.4f} seconds for text of length {text_length}.")
@@ -179,7 +179,7 @@ async def detect_entities_batch(
     response.headers["X-Text-Length"] = str(total_text_length)
 
     try:
-        start_time: float = process_time()
+        start_time: float = perf_counter()
         raw_entities_list: list[list[dict[str, Any]]] = gliner.batch_predict_entities(
             texts=request.texts,
             labels=request.entity_types,
@@ -187,7 +187,7 @@ async def detect_entities_batch(
             threshold=request.threshold,
             multi_label=request.multi_label,
         )
-        inference_time: float = process_time() - start_time
+        inference_time: float = perf_counter() - start_time
         inference_time_metric.labels("POST", "/api/batch").observe(inference_time)
         response.headers["X-Inference-Time"] = f"{inference_time:.4f}"
         logger.debug(
