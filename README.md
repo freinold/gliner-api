@@ -56,24 +56,7 @@ docker run -p 8080:8080 \
 
 ### Run with Docker Compose
 
-Edit `compose.yaml` to select the config you want (see `example_configs/`). Example:
-
-```yaml
-services:
-  gliner-api:
-    image: ghcr.io/freinold/gliner-api:0.1.0-rc4
-    ports:
-      - "8080:8080"
-    volumes:
-      - "${HOME}/.cache/huggingface:/app/huggingface"
-    configs:
-      - source: app_config
-        target: /app/config.yaml
-
-configs:
-  app_config:
-    file: example_configs/pii.yaml
-```
+Edit [`compose.yaml`](compose.yaml) to select the config you want (see `example_configs/`).
 
 Then start:
 
