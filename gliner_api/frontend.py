@@ -15,13 +15,29 @@ client: AsyncClient = AsyncClient(
 )
 
 
-async def call_invoke(text: str) -> tuple[dict[str, str | list[dict[str, Any]]], list[dict[str, Any]]]:
+async def call_invoke(
+    text: str,
+    threshold: float,
+    entity_types: list[str],
+    additional_options: list[str],
+) -> tuple[dict[str, str | list[dict[str, Any]]], list[dict[str, Any]]]:
     """Call the /api/invoke endpoint with the provided text."""
+    flat_ner: bool = "deep_ner" not in additional_options
+    multi_label: bool = "multi_label" in additional_options
     response: Response | None = None
     try:
-        async for attempt in retry_context(on=HTTPError):
+        async for attempt in retry_context(on=HTTPError, attempts=3):
             with attempt:
-                response = await client.post("/api/invoke", json={"text": text})
+                response = await client.post(
+                    url="/api/invoke",
+                    json={
+                        "text": text,
+                        "threshold": threshold,
+                        "entity_types": entity_types,
+                        "flat_ner": flat_ner,
+                        "multi_label": multi_label,
+                    },
+                )
                 response.raise_for_status()
 
     except HTTPError as e:
@@ -54,7 +70,7 @@ async def call_invoke(text: str) -> tuple[dict[str, str | list[dict[str, Any]]],
 
 description: str = """
 <div style='text-align: center;'>
-    <img src='/static/logo.png' alt='GLiNER Logo' style='width: 200px; height: auto; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;'>
+    <img src='/static/logo.png' alt='GLiNER Logo' style='height: 50px; width: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;'>
     <div>
         A simple frontend for the GLiNER entity detection API.
     </div>
@@ -69,7 +85,40 @@ article: str = """
 
 interface = gr.Interface(
     fn=call_invoke,
-    inputs=gr.Textbox(label="Input Text", placeholder="Enter text to analyze...", lines=5, max_lines=15),
+    inputs=[
+        gr.Textbox(
+            label="Input Text",
+            placeholder="Enter text...",
+            lines=5,
+            max_lines=15,
+            info="Text to analyze for named entities.",
+        ),
+        gr.Slider(
+            label="Threshold",
+            minimum=0.0,
+            maximum=1.0,
+            step=0.05,
+            value=config.default_threshold,
+            info="Minimum confidence score for entities to be included in the response.",
+        ),
+        gr.Dropdown(
+            label="Entity Types",
+            choices=config.default_entities,
+            multiselect=True,
+            value=config.default_entities,
+            allow_custom_value=True,
+            info="Select entity types to detect. Add custom entity types as needed.",
+        ),
+        gr.CheckboxGroup(
+            label="Additional Options (Advanced)",
+            choices=[
+                ("Enable deep NER mode", "deep_ner"),
+                ("Enable multi-label classification", "multi_label"),
+            ],
+            value=[],
+            info="Deep NER: hierarchical entity detection for nested entities. Multi-label: entities can belong to multiple types.",
+        ),
+    ],
     outputs=[
         gr.HighlightedText(label="Detected Entities"),
         gr.JSON(label="Raw Response Payload"),
