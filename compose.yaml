@@ -1,7 +1,7 @@
 name: gliner-api
 services:
   gliner-api:
-    image: ghcr.io/freinold/gliner-api:0.1.0-rc4@sha256:b61c4f03952340a6cf1156f750f58829571d2e004c35f5714b76158434ed1013
+    image: ghcr.io/freinold/gliner-api:0.1.0-rc5
     ports:
       - "8080:8080" # API and Gradio frontend
       - "9090:9090" # Prometheus metrics
@@ -9,7 +9,7 @@ services:
     tty: true
     volumes:
       - "${HOME}/.cache/huggingface:/app/huggingface"
-      - "./example_configs/pii.yaml:/app/config.yaml:ro"
+      - "./example_configs/general.yaml:/app/config.yaml:ro"
     environment:
       []
       # If you want to secure your API, set your key here

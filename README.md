@@ -39,7 +39,7 @@ docker run \
   -p 9090:9090 \
   -v $(pwd)/config.yaml:/app/config.yaml \
   -v $HOME/.cache/huggingface:/app/huggingface \
-  ghcr.io/freinold/gliner-api:0.1.0-rc4
+  ghcr.io/freinold/gliner-api:0.1.0-rc5
 ```
 
 - `-v $(pwd)/config.yaml:/app/config.yaml` mounts your config file (edit as needed)
