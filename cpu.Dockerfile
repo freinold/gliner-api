@@ -25,7 +25,7 @@ COPY . /app
 
 # Install the dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --no-dev --extra cpu --compile-bytecode 
+    uv sync --no-dev --extra cpu --extra frontend --compile-bytecode 
 
 # Use slim image as runner
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:235c2e8419851c1d539e2b19033d56aaf82670bfaaa155e20ac6b21260dc0be9 AS runner
