@@ -34,10 +34,12 @@ You can either build the container yourself or use a prebuilt image from GitHub 
 #### Run prebuilt container (recommended)
 
 ```bash
-docker run -p 8080:8080 \
+docker run \
+  -p 8080:8080 \
+  -p 9090:9090 \
   -v $(pwd)/config.yaml:/app/config.yaml \
   -v $HOME/.cache/huggingface:/app/huggingface \
-  ghcr.io/freinold/gliner-api:0.1.0-rc4
+  ghcr.io/freinold/gliner-api:0.1.0
 ```
 
 - `-v $(pwd)/config.yaml:/app/config.yaml` mounts your config file (edit as needed)
@@ -47,7 +49,9 @@ docker run -p 8080:8080 \
 
 ```bash
 docker build -f cpu.Dockerfile -t gliner-api .
-docker run -p 8080:8080 \
+docker run \
+  -p 8080:8080 \
+  -p 9090:9090 \
   -v $(pwd)/config.yaml:/app/config.yaml \
   -v $HOME/.cache/huggingface:/app/huggingface \
   gliner-api
@@ -69,6 +73,8 @@ docker compose up --build
 
 ### Run the app directly
 
+Be sure to check the [installation instructions](#installation) first.
+
 ```bash
 uv run main.py [OPTIONS]
 ```
@@ -87,18 +93,18 @@ uv run main.py --help
 
 | Option                  | Description                                               | Default                                          |
 | ----------------------- | --------------------------------------------------------- | ------------------------------------------------ |
-| `--use_case` / `--name` | Use case for the GLiNER model (application/domain)        | `general`                                        |
-| `--model_id`            | Huggingface model ID ([browse models][gliner-models])     | `knowledgator/gliner-x-base`                     |
-| `--onnx_enabled`        | Use ONNX for inference                                    | `False`                                          |
-| `--onnx_model_path`     | Path to ONNX model file                                   | `model.onnx`                                     |
-| `--default_entities`    | Default entities to detect                                | `['person', 'organization', 'location', 'date']` |
-| `--default_threshold`   | Default detection threshold                               | `0.5`                                            |
-| `--api_key`             | API key for authentication (if set, required in requests) | `null`                                           |
+| `--use-case` / `--name` | Use case for the GLiNER model (application/domain)        | `general`                                        |
+| `--model-id`            | Huggingface model ID ([browse models][gliner-models])     | `knowledgator/gliner-x-base`                     |
+| `--onnx-enabled`        | Use ONNX for inference                                    | `False`                                          |
+| `--onnx-model-path`     | Path to ONNX model file                                   | `model.onnx`                                     |
+| `--default-entities`    | Default entities to detect                                | `['person', 'organization', 'location', 'date']` |
+| `--default-threshold`   | Default detection threshold                               | `0.5`                                            |
+| `--api-key`             | API key for authentication (if set, required in requests) | `null`                                           |
 | `--host`                | Host address                                              | `0.0.0.0`                                        |
 | `--port`                | Port                                                      | `8080`                                           |
-| `--metrics_enabled`     | Enable Prometheus metrics endpoint                        | `True`                                           |
-| `--metrics_port`        | Port for Prometheus metrics endpoint                      | `9090`                                           |
-| `--frontend_enabled`    | Enable Gradio frontend                                    | `True`                                           |
+| `--metrics-enabled`     | Enable Prometheus metrics endpoint                        | `True`                                           |
+| `--metrics-port`        | Port for Prometheus metrics endpoint                      | `9090`                                           |
+| `--frontend-enabled`    | Enable Gradio frontend                                    | `True`                                           |
 
 [gliner-models]: https://huggingface.co/models?library=gliner&sort=trending
 
@@ -107,7 +113,7 @@ uv run main.py --help
 ## API & Frontend
 
 - **API docs:** `/docs` (Swagger UI), `/redoc`
-- **Prometheus metrics:** `/metrics` (if enabled, served on a separate port set with `--metrics-port`, default: 9090)
+- **Prometheus metrics:** `/metrics` (if enabled, served on a separate port, e.g. 9090)
 - **Gradio frontend:** `/` (if enabled)
 
 ---
