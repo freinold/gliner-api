@@ -1,4 +1,4 @@
-from prometheus_client import Counter, Enum, Histogram, Info, make_asgi_app
+from prometheus_client import Counter, Enum, Histogram, Info
 
 from gliner_api.datamodel import InfoResponse
 
@@ -35,5 +35,3 @@ app_state_metric: Enum = Enum(
 
 # Observe info by using the InfoResponse model
 info_metric.info({k: str(v) for k, v in InfoResponse().model_dump().items()})
-
-metrics_app = make_asgi_app()
