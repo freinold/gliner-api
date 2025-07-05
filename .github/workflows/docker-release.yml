@@ -54,6 +54,7 @@ jobs:
             TAG=${GITHUB_REF#refs/tags/}
             echo "tag=${TAG}" >> $GITHUB_OUTPUT
           fi
+          echo "repo_lowercase=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Cache uv cache
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
@@ -70,8 +71,8 @@ jobs:
           file: ./cpu.Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.tag }}
-            ${{ steps.vars.outputs.tag != 'latest' && format('ghcr.io/{0}:latest', github.repository) || '' }}
+            ghcr.io/${{ steps.vars.outputs.repo_lowercase }}:${{ steps.vars.outputs.tag }}
+            ${{ steps.vars.outputs.tag != 'latest' && format('ghcr.io/{0}:latest', steps.vars.outputs.repo_lowercase) || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
