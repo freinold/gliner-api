@@ -1,7 +1,7 @@
 name: gliner-api
 services:
   gliner-api:
-    image: ghcr.io/freinold/gliner-api:0.1.0-rc5
+    image: ghcr.io/freinold/gliner-api:latest
     ports:
       - "8080:8080" # API and Gradio frontend
       - "9090:9090" # Prometheus metrics
