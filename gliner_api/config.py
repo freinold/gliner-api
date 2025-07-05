@@ -73,6 +73,8 @@ class Config(BaseSettings):
         yaml_file="config.yaml",
         yaml_file_encoding="utf-8",
         cli_parse_args=True,
+        cli_kebab_case=True,
+        cli_prog_name="gliner-api",
     )
 
     # Reorder settings sources to prioritize YAML config
