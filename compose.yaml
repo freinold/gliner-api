@@ -9,7 +9,7 @@ services:
     tty: true
     volumes:
       - "${HOME}/.cache/huggingface:/app/huggingface"
-      - "./example_configs/general.yaml:/app/config.yaml:ro"
+      - "./example_configs/general_onnx.yaml:/app/config.yaml:ro"
     environment:
       []
       # If you want to secure your API, set your key here
