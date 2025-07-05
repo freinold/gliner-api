@@ -21,6 +21,7 @@
 - **Docker** and **Docker Compose** support.
 - **ONNX** inference support (including quantized models).
 - **API key** authentication (optional).
+- **Custom metrics port** and enable/disable option for Prometheus metrics.
 
 ---
 
@@ -96,6 +97,7 @@ uv run main.py --help
 | `--host`                | Host address                                              | `0.0.0.0`                                        |
 | `--port`                | Port                                                      | `8080`                                           |
 | `--metrics_enabled`     | Enable Prometheus metrics endpoint                        | `True`                                           |
+| `--metrics_port`        | Port for Prometheus metrics endpoint                      | `9090`                                           |
 | `--frontend_enabled`    | Enable Gradio frontend                                    | `True`                                           |
 
 [gliner-models]: https://huggingface.co/models?library=gliner&sort=trending
@@ -105,7 +107,7 @@ uv run main.py --help
 ## API & Frontend
 
 - **API docs:** `/docs` (Swagger UI), `/redoc`
-- **Prometheus metrics:** `/metrics` (if enabled)
+- **Prometheus metrics:** `/metrics` (if enabled, served on a separate port set with `--metrics-port`, default: 9090)
 - **Gradio frontend:** `/` (if enabled)
 
 ---

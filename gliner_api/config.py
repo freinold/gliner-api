@@ -51,6 +51,12 @@ class Config(BaseSettings):
         default=True,
         description="Whether to enable Prometheus metrics for the API. If enabled, metrics will be available at /metrics endpoint.",
     )
+    metrics_port: int = Field(
+        default=9090,
+        ge=1,
+        le=65535,
+        description="The port number for serving Prometheus metrics. This is only used if metrics_enabled is set to True.",
+    )
     frontend_enabled: bool = Field(
         default=True,
         description="Whether to enable the Gradio frontend for the API. If enabled, the frontend will be available at server root.",
@@ -67,6 +73,8 @@ class Config(BaseSettings):
         yaml_file="config.yaml",
         yaml_file_encoding="utf-8",
         cli_parse_args=True,
+        cli_kebab_case=True,
+        cli_prog_name="gliner-api",
     )
 
     # Reorder settings sources to prioritize YAML config
