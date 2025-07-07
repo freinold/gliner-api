@@ -10,7 +10,7 @@ from gliner_api.config import Config, get_config
 
 config: Config = get_config()
 client: AsyncClient = AsyncClient(
-    base_url=f"http://{config.host}:{config.port}",
+    base_url=f"http://localhost:{config.port}",
     headers={"Authorization": f"Bearer {config.api_key}"} if config.api_key is not None else None,
 )
 
