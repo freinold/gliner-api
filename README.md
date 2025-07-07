@@ -48,8 +48,14 @@ docker run \
 #### Build and run locally (CPU version)
 
 ```bash
-docker build -f cpu.Dockerfile -t gliner-api .
-docker run \
+docker build \
+  -f cpu.Dockerfile \
+  --build-arg IMAGE_CREATED="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --build-arg IMAGE_REVISION="$(git rev-parse HEAD)" \
+  --build-arg IMAGE_VERSION="$(git describe --tags --always)" \
+  -t gliner-api .
+
+docker run --rm \
   -p 8080:8080 \
   -p 9090:9090 \
   -v $(pwd)/config.yaml:/app/config.yaml \
