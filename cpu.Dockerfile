@@ -54,6 +54,7 @@ COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Set cache directory for Huggingface Models
+RUN mkdir -p /app/huggingface && chown -R 1000:1000 /app/huggingface
 ENV HF_HOME=/app/huggingface
 
 # Disable tqdm for cleaner logs
