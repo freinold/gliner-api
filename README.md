@@ -25,6 +25,20 @@
 
 ---
 
+## Documentation
+
+For detailed documentation, [see DeepWiki](https://deepwiki.com/freinold/GLiNER-API) (⚠️ AI-generated)
+
+---
+
+## Live Demo
+
+You can try the live demo of the GLiNER API container in it's Huggingface Space: [GLiNER API Demo](https://huggingface.co/spaces/freinold/gliner-api).
+
+It uses a minimally changed image to make it work in the Huggingface Space environment.
+
+---
+
 ## Usage
 
 ### Run with Docker
@@ -116,11 +130,14 @@ uv run main.py --help
 
 ---
 
-## API & Frontend
+## API & Frontend Endpoints
 
-- **API docs:** `/docs` (Swagger UI), `/redoc`
-- **Prometheus metrics:** `/metrics` (if enabled, served on a separate port, e.g. 9090)
-- **Gradio frontend:** `/` (if enabled)
+| Description                  | Path       | Demo Link                                                     |
+| ---------------------------- | ---------- | ------------------------------------------------------------- |
+| Gradio Frontend (if enabled) | `/`        | [Frontend](https://freinold-gliner-api.hf.space/)             |
+| API Docs (Swagger)           | `/docs`    | [Swagger UI](https://freinold-gliner-api.hf.space/docs)       |
+| API Docs (ReDoc)             | `/redoc`   | [ReDoc](https://freinold-gliner-api.hf.space/redoc)           |
+| Prometheus Metrics           | `/metrics` | _(no public demo link; available on metrics port if enabled)_ |
 
 ---
 
