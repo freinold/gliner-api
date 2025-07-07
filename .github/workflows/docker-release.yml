@@ -64,6 +64,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-
 
+      - name: Set build timestamp
+        id: build_ts
+        run: echo "BUILD_TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
       - name: Build and push Docker image
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
@@ -76,7 +80,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            IMAGE_CREATED=${{ github.event.repository.pushed_at || github.run_started_at }}
+            IMAGE_CREATED=${{ github.event.repository.pushed_at || env.BUILD_TS }}
             IMAGE_REVISION=${{ github.sha }}
             IMAGE_VERSION=${{ steps.vars.outputs.tag }}
 
