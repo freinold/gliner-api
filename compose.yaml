@@ -2,6 +2,11 @@ name: gliner-api
 services:
   gliner-api:
     image: ghcr.io/freinold/gliner-api:latest
+    ## Alternatively, you can build the image locally: choose either the CPU or GPU Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: cpu.Dockerfile
+    #   dockerfile: gpu.Dockerfile
     ports:
       - "8080:8080" # API and Gradio frontend
       - "9090:9090" # Prometheus metrics
@@ -12,5 +17,5 @@ services:
       - "./example_configs/general_onnx.yaml:/app/config.yaml:ro"
     environment:
       []
-      # If you want to secure your API, set your key here
+      # If you want to secure your deployment, set your API key here
       # - GLINER_API_API_KEY=CHANGEME
