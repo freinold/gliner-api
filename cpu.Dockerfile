@@ -59,6 +59,7 @@ ENV HF_HOME=/app/huggingface
 
 # Disable tqdm for cleaner logs
 ENV TQDM_DISABLE=1
+ENV HF_HUB_DISABLE_PROGRESS_BARS=1
 
 # Disable python warnings
 ENV PYTHONWARNINGS="ignore"
