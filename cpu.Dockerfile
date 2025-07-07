@@ -31,11 +31,14 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:235c2e8419851c1d539e2b19033d56aaf82670bfaaa155e20ac6b21260dc0be9 AS runner
 
 # Metadata for the image
+ARG IMAGE_CREATED="unknown"
+ARG IMAGE_REVISION="unknown"
+ARG IMAGE_VERSION="unknown"
 LABEL org.opencontainers.image.authors='Fabian Reinold <contact@freinold.eu>' \
     org.opencontainers.image.vendor='Fabian Reinold' \
-    org.opencontainers.image.created='$(date -u +%Y-%m-%dT%H:%M:%SZ)' \
-    org.opencontainers.image.revision='$(git rev-parse HEAD)' \
-    org.opencontainers.image.version='$(git describe --tags --always)' \
+    org.opencontainers.image.created="$IMAGE_CREATED" \
+    org.opencontainers.image.revision="$IMAGE_REVISION" \
+    org.opencontainers.image.version="$IMAGE_VERSION" \
     org.opencontainers.image.url='https://github.com/freinold/gliner-api/pkgs/container/gliner-api' \
     org.opencontainers.image.documentation='https://github.com/freinold/gliner-api/README.md' \
     org.opencontainers.image.source='https://github.com/freinold/gliner-api' \
