@@ -75,6 +75,10 @@ jobs:
             ${{ steps.vars.outputs.tag != 'latest' && format('ghcr.io/{0}:latest', steps.vars.outputs.repo_lowercase) || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            IMAGE_CREATED=${{ github.event.repository.pushed_at || github.run_started_at }}
+            IMAGE_REVISION=${{ github.sha }}
+            IMAGE_VERSION=${{ steps.vars.outputs.tag }}
 
       - name: Image digest
         run: |
