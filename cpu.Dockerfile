@@ -53,8 +53,12 @@ COPY --from=builder /app/.venv /app/.venv
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Set cache directory for Huggingface Models
-RUN mkdir -p /app/huggingface && chown -R 1000:1000 /app/huggingface
+# Create a non-root user and group with UID/GID 1000
+RUN groupadd -g 1000 appuser && \
+    useradd -m -u 1000 -g appuser appuser
+
+# Set cache directory for Huggingface Models and set ownership to appuser
+RUN mkdir -p /app/huggingface && chown -R appuser:appuser /app/huggingface
 ENV HF_HOME=/app/huggingface
 
 # Disable tqdm for cleaner logs
@@ -63,6 +67,9 @@ ENV HF_HUB_DISABLE_PROGRESS_BARS=1
 
 # Disable python warnings
 ENV PYTHONWARNINGS="ignore"
+
+# Switch to non-root user
+USER appuser
 
 # Reset the entrypoint, don't invoke `uv`
 ENTRYPOINT ["python", "main.py"]
