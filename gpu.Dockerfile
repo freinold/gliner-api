@@ -49,13 +49,6 @@ LABEL org.opencontainers.image.authors='Fabian Reinold <contact@freinold.eu>' \
 # Install the project into `/app`
 WORKDIR /app
 
-# Nur das, was du wirklich brauchst, übernehmen:
-COPY --from=builder /app /app
-COPY --from=builder /app/.venv /app/.venv
-
-# Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
-
 # Create a non-root user and group with UID/GID 1000
 RUN groupadd -g 1000 appuser && \
     useradd -m -u 1000 -g appuser appuser
@@ -63,6 +56,12 @@ RUN groupadd -g 1000 appuser && \
 # Set cache directory for Huggingface Models and set ownership to appuser
 RUN mkdir -p /app/huggingface && chown -R appuser:appuser /app/huggingface
 ENV HF_HOME=/app/huggingface
+
+# Copy the application files from the builder stage
+COPY --from=builder --chown=appuser:appuser /app /app
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Disable tqdm for cleaner logs
 ENV TQDM_DISABLE=1
