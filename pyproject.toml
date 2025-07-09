@@ -5,7 +5,7 @@ description = "A minimal FastAPI app serving GLiNER models"
 readme = "README.md"
 requires-python = "==3.12.11"
 dependencies = [
-    "fastapi[standard]==0.115.14",
+    "fastapi[standard]==0.116.0",
     "gitpython==3.1.44",
     "huggingface-hub==0.33.2",
     "prometheus-client==0.22.1",
