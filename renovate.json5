@@ -14,12 +14,12 @@
   packageRules: [
     {
       matchDatasources: ["python-version"],
-      allowedVersions: "3.12.x",
+      allowedVersions: ">=3.12,<3.13",
       versioning: "python",
     },
     {
       matchManagers: ["pyenv"],
-      allowedVersions: "3.12.x",
+      allowedVersions: ">=3.12,<3.13",
       versioning: "python",
     },
   ],
