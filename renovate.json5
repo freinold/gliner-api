@@ -13,7 +13,7 @@
   ],
   packageRules: [
     {
-      matchDatasource: ["python-version"],
+      matchDatasources: ["python-version"],
       allowedVersions: "3.12.x",
       versioning: "python",
     },
