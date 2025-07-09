@@ -2,7 +2,7 @@
 
 # gliner-api
 
-## A minimal FastAPI app serving GLiNER models.
+## A minimal FastAPI app serving GLiNER models
 
 [![License](https://img.shields.io/github/license/freinold/gliner-api)](https://github.com/freinold/gliner-api/blob/main/LICENSE)
 [![CodeQL](https://github.com/freinold/gliner-api/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/freinold/gliner-api/actions/workflows/github-code-scanning/codeql)
@@ -33,6 +33,8 @@ You can either build the container yourself or use a prebuilt image from GitHub 
 
 #### Run prebuilt container (recommended)
 
+**CPU version:**
+
 ```bash
 docker run \
   -p 8080:8080 \
@@ -41,6 +43,20 @@ docker run \
   -v $HOME/.cache/huggingface:/app/huggingface \
   ghcr.io/freinold/gliner-api:latest
 ```
+
+**GPU version:**
+
+```bash
+docker run \
+  --gpus all \ # Specify your GPU resources
+  -p 8080:8080 \
+  -p 9090:9090 \
+  -v $(pwd)/config.yaml:/app/config.yaml \
+  -v $HOME/.cache/huggingface:/app/huggingface \
+  ghcr.io/freinold/gliner-api-gpu:latest
+```
+
+**Mounting volumes:**
 
 - `-v $(pwd)/config.yaml:/app/config.yaml` mounts your config file (edit as needed)
 - `-v $HOME/.cache/huggingface:/app/huggingface` mounts your Huggingface cache for faster model loading
@@ -61,6 +77,25 @@ docker run --rm \
   -v $(pwd)/config.yaml:/app/config.yaml \
   -v $HOME/.cache/huggingface:/app/huggingface \
   gliner-api
+```
+
+#### Build and run locally (GPU version)
+
+```bash
+docker build \
+  -f gpu.Dockerfile \
+  --build-arg IMAGE_CREATED="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  --build-arg IMAGE_REVISION="$(git rev-parse HEAD)" \
+  --build-arg IMAGE_VERSION="$(git describe --tags --always)" \
+  -t gliner-api-gpu .
+
+docker run --rm \
+  --gpus all \ # Specify your GPU resources
+  -p 8080:8080 \
+  -p 9090:9090 \
+  -v $(pwd)/config.yaml:/app/config.yaml \
+  -v $HOME/.cache/huggingface:/app/huggingface \
+  gliner-api-gpu
 ```
 
 ---
