@@ -48,7 +48,7 @@ docker run \
 
 ```bash
 docker run \
-  --gpus all \ # Specify your GPU resources
+  --gpus all \
   -p 8080:8080 \
   -p 9090:9090 \
   -v $(pwd)/config.yaml:/app/config.yaml \
@@ -90,7 +90,7 @@ docker build \
   -t gliner-api-gpu .
 
 docker run --rm \
-  --gpus all \ # Specify your GPU resources
+  --gpus all \
   -p 8080:8080 \
   -p 9090:9090 \
   -v $(pwd)/config.yaml:/app/config.yaml \
