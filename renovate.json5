@@ -17,6 +17,11 @@
       allowedVersions: "3.12.x",
       versioning: "python",
     },
+    {
+      matchManagers: ["pyenv"],
+      allowedVersions: "3.12",
+      versioning: "docker",
+    },
   ],
   lockFileMaintenance: {
     enabled: true,
