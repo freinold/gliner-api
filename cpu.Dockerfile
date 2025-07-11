@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --no-dev --extra cpu --extra frontend
 
 # Use slim image as runner
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:235c2e8419851c1d539e2b19033d56aaf82670bfaaa155e20ac6b21260dc0be9 AS runner
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim@sha256:6a95f6c166ae83e005df4e8d3c3fb7342a5a969757a3f564081b73c7cbd21cf7 AS runner
 
 # Metadata for the image
 ARG IMAGE_CREATED="unknown"
