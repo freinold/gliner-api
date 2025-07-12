@@ -16,7 +16,7 @@ dependencies = [
 [project.optional-dependencies]
 cpu = ["torch==2.7.1", "gliner[tokenizers]==0.2.21"]
 gpu = ["torch==2.7.1", "gliner[gpu,tokenizers]==0.2.21"]
-frontend = ["gradio==5.35.0", "httpx==0.28.1", "stamina==25.1.0"]
+frontend = ["gradio==5.36.2", "httpx==0.28.1", "stamina==25.1.0"]
 
 [tool.uv]
 conflicts = [[{ extra = "cpu" }, { extra = "gpu" }]]
