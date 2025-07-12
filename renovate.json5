@@ -11,6 +11,7 @@
     ":timezone(Europe/Berlin)", // sets correct timezone for schedule based operations
     "security:openssf-scorecard", // show OpenSSF badge on pull requests to evaluate security health metrics for dependencies
   ],
+  labels: ["renovate", "lifecycle"],
   packageRules: [
     {
       matchDatasources: ["python-version"],
